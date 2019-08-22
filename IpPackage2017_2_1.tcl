@@ -36,6 +36,7 @@ variable RemoveAutoIf
 variable DriverDir
 variable DriverFiles
 variable ClockInputs
+variable DefaultVhdlLib
 
 # Initialize IP Packaging process
 #
@@ -69,6 +70,7 @@ proc init {name version revision library} {
 	variable DriverDir "None"
 	variable TopEntity "None"
 	variable ClockInputs [list]
+	variable DefaultVhdlLib $IpName\_$IpVersionUnderscore
 }
 namespace export init
 
@@ -107,9 +109,20 @@ namespace export set_datasheet_relative
 # Add source files that are referenced to relatively
 #
 # @param srcs		List containing the source file paths relative to execution director
-proc add_sources_relative {srcs} {
-	variable SrcRelative
-	variable SrcRelative [concat $SrcRelative $srcs]
+# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
+proc add_sources_relative {srcs {lib "NONE"}} {
+	variable SrcRelative 
+	variable DefaultVhdlLib
+	variable srcFile [dict create]
+	foreach file $srcs {
+		dict set srcFile SRC_PATH $file
+		if {$lib == "NONE"} {
+			dict set srcFile LIBRARY $DefaultVhdlLib
+		} else {
+			dict set srcFile LIBRARY $lib
+		}
+		lappend SrcRelative $srcFile
+	}
 }
 namespace export add_sources_relative
 
@@ -136,10 +149,19 @@ namespace export add_drivers_relative
 #
 # @param libPath	Relative path to the common library director of all files 
 # @param files		List containing the file paths within the library
-proc add_lib_relative {libPath files} {
+# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
+proc add_lib_relative {libPath files {lib "NONE"}} {
 	variable LibRelative
-	foreach file $files {		
-		lappend LibRelative [concat $libPath/$file]
+	variable DefaultVhdlLib
+	foreach file $files {
+		variable libFile [dict create]
+		dict set libFile SRC_PATH [concat $libPath/$file]
+		if {$lib == "NONE"} {
+			dict set libFile LIBRARY $DefaultVhdlLib
+		} else {
+			dict set libFile LIBRARY $lib
+		}
+		lappend LibRelative $libFile
 	}
 }
 namespace export add_lib_relative
@@ -149,12 +171,19 @@ namespace export add_lib_relative
 # @param tgtPath	Relative path to the directory in the IP-Core the files shall be copied into
 # @param libPath	Relative path to the common library director of all files 
 # @param files		List containing the file paths within the library directory
-proc add_lib_copied {tgtPath libPath files} {
+# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
+proc add_lib_copied {tgtPath libPath files {lib "NONE"}} {
 	variable LibCopied
+	variable DefaultVhdlLib
 	foreach file $files {
 		variable copied [dict create]
 		dict set copied TGT_PATH [concat $tgtPath/$file]
 		dict set copied SRC_PATH [concat $libPath/$file]
+		if {$lib == "NONE"} {
+			dict set copied LIBRARY $DefaultVhdlLib
+		} else {
+			dict set copied LIBRARY $lib
+		}
 		lappend LibCopied $copied
 	}
 }
@@ -193,7 +222,7 @@ namespace export set_interface_clock
 # Create a GUI parameter that exists in VHDL. After all settings are made for the parameter, it must be
 # added to the current GUI page using gui_add_parameter
 #
-# @param vhdlName		Name of the parameter in VhdlLib
+# @param vhdlName		Name of the parameter in Vhdl
 # @param displayName	Name of the parameter to be displayed in the GUI
 proc gui_create_parameter {vhdlName displayName} {
 	variable CurrentPage	
@@ -318,21 +347,26 @@ proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
 	###############################################################
 	# Project config
 	###############################################################	
+	
 	#add source files
 	variable SrcRelative
 	variable LibRelative
 	puts "*** Add source files to Project ***"
 	if {[llength $SrcRelative] > 0} {
 		foreach file $SrcRelative {
-			puts $file
-			add_files -norecurse $file
+			variable thisfile [dict get $file SRC_PATH]
+			puts $thisfile
+			add_files -norecurse $thisfile
+			set_property library [dict get $file LIBRARY] [get_files $thisfile]
 		}
 	}
 	puts "*** Add relative library files to Project ***"
 	if {[llength $LibRelative] > 0} {
 		foreach file $LibRelative {
-			puts $file
-			add_files -norecurse $file
+			variable thisfile [dict get $file SRC_PATH]
+			puts $thisfile
+			add_files -norecurse $thisfile
+			set_property library [dict get $file LIBRARY] [get_files $thisfile]
 		}		
 	}
 	
@@ -348,17 +382,10 @@ proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
 			puts "$srcPath > $tgtPath"
 			#Copy
 			file copy -force $srcPath $tgtPath
-			lappend copiedLib $tgtPath	
+			add_files -norecurse $tgtPath
+			set_property library [dict get $copied LIBRARY] [get_files $tgtPath]
 		}
-		add_files -norecurse $copiedLib
 	}
-	
-	#Set Library
-	variable IpName
-	variable IpVersionUnderscore
-	variable VhdlLib $IpName\_$IpVersionUnderscore
-	set_property Library $VhdlLib [get_files  {*}]
-	update_compile_order -fileset sources_1
 	
 	#Set top entity
 	puts "*** Select Top Entity ***"
@@ -371,6 +398,8 @@ proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
 	variable IpLibrary
 	variable IpDescription
 	variable IpVersion 
+	variable IpName
+	variable DefaultVhdlLib
 	puts "*** Set IP properties ***"
 	#Having unreferenced files is not allowed (leads to problems in the script). Therefore the warning is promoted to an error.
 	set_msg_config -id  {[IP_Flow 19-3833]} -new_severity "ERROR"
@@ -378,7 +407,7 @@ proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
 	set_property vendor "psi.ch" [ipx::current_core]
 	set_property name $IpName [ipx::current_core]
 	set_property library $IpLibrary [ipx::current_core]
-	set_property display_name $VhdlLib [ipx::current_core]
+	set_property display_name $DefaultVhdlLib [ipx::current_core]
 	set_property description $IpDescription [ipx::current_core]
 	set_property vendor_display_name "Paul Scherrer Institut" [ipx::current_core]
 	set_property company_url "http://www.psi.ch" [ipx::current_core]
@@ -390,8 +419,9 @@ proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
 	#Make Library Paths Relative
 	puts "*** Convert library paths to relative paths ***"
 	foreach file $LibRelative {
+		variable fileName [dict get $file SRC_PATH]
 		foreach fileset {xilinx_anylanguagesynthesis xilinx_anylanguagebehavioralsimulation} {
-			set_property name [psi::util::path::relTo $tgtDir $file] [ipx::get_files */[file tail $file] -of_objects [ipx::get_file_groups $fileset -of_objects [ipx::current_core]]]
+			set_property name [psi::util::path::relTo $tgtDir $fileName] [ipx::get_files */[file tail $fileName] -of_objects [ipx::get_file_groups $fileset -of_objects [ipx::current_core]]]
 		}
 	}
 	

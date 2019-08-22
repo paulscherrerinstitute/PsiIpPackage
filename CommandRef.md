@@ -184,7 +184,7 @@ Usually Vivado automatically detects the top entity name. If this works, the com
 **Usage**
 
 ```
-add_sources_relative <srcs>
+add_sources_relative <srcs> <lib>
 ```
 
 **Description**
@@ -192,11 +192,7 @@ add_sources_relative <srcs>
 Add one or more source files to the IP-Core. Note that the source files are not copied into the IP-Core but
 referenced relatively because usually IP-Cores are delivered as GIT repository and already contain the sources.
 
-Note that the library the source files are compiled into cannot be chosen automatically. All files are compiled
-into a library that is generated automatically for each IP-Core.
-
-The driver sources must be located in the folder *DRIVER_MAIN/src* due to Limitations of Vivado. A folder 
-*DRIVER_MAIN/data* must also exist, also because Vivado expects this folder.
+By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
 
 **Parameters**
 <table>
@@ -210,13 +206,18 @@ The driver sources must be located in the folder *DRIVER_MAIN/src* due to Limita
       <td> No </td>
       <td> Path to one or more source files. If multiple source files should be added, a list of paths must be passed. </td>
     </tr>
+    <tr>
+      <td> lib </td>
+      <td> Yes </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+    </tr>
 </table>
 
 ### add_lib_relative
 **Usage**
 
 ```
-add_lib_relative <libPath> <files>
+add_lib_relative <libPath> <files> <lib>
 ```
 
 **Description**
@@ -225,8 +226,7 @@ Add one or more library files to the IP-Core. This command does not copy the lib
 just links them using relative paths. As a result, in every project its own version of the library could be used. To
 copy the library files into the IP-Core, use [add_lib_copied](add_lib_copied) .
 
-Note that the library the  files are compiled into cannot be chosen automatically. All files are compiled
-into a library that is generated automatically for each IP-Core.
+By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
 
 **Parameters**
 
@@ -246,13 +246,18 @@ into a library that is generated automatically for each IP-Core.
       <td> No </td>
       <td> List of files to add to the IP-Core </td>
     </tr>	
+    <tr>
+      <td> lib </td>
+      <td> Yes </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+    </tr>
 </table>
 
 ### add_lib_copied
 **Usage**
 
 ```
-add_lib_copied <tgtPath> <libPath> <files>
+add_lib_copied <tgtPath> <libPath> <files> <lib>
 ```
 
 **Description**
@@ -262,8 +267,7 @@ same library files are used independently of the environment of the IP-Core. The
 files are delivered as part of the IP-Core and it is not possible to easily find out which version (commit) of the library
 they represent.
 
-Note that the library the  files are compiled into cannot be chosen automatically. All files are compiled
-into a library that is generated automatically for each IP-Core.
+By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
 
 **Parameters**
 <table>
@@ -287,6 +291,11 @@ into a library that is generated automatically for each IP-Core.
       <td> No </td>
       <td> List of files to add to the IP-Core </td>
     </tr>	
+    <tr>
+      <td> lib </td>
+      <td> Yes </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+    </tr>
 </table>
 
 ### gui_add_page
