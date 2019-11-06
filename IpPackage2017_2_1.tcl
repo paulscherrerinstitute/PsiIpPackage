@@ -478,6 +478,13 @@ proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
 		}
 	}
 	
+	#Remove autodetected interfaces
+	puts "*** Remove autodetected interfaces ***"
+	variable RemoveAutoIf
+	foreach ifName $RemoveAutoIf {
+		ipx::remove_bus_interface $ifName [ipx::current_core]
+	}
+	
 	#Handle Interfaces not detected automatically
 	puts "*** Handle Interfaces not detected automatically ***"
 	puts "Clocks"
@@ -507,13 +514,6 @@ proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
 	foreach cond $InterfaceEnablementConditions {
 		set_property enablement_dependency [dict get $cond CONDITION] [ipx::get_bus_interfaces [dict get $cond INTERFACE] -of_objects [ipx::current_core]]
 	}	
-	
-	#Remove autodetected interfaces
-	puts "*** Remove autodetected interfaces ***"
-	variable RemoveAutoIf
-	foreach ifName $RemoveAutoIf {
-		ipx::remove_bus_interface $ifName [ipx::current_core]
-	}
 	
 	#Set interface clocks
 	puts "*** Set Interface Clocks ***"
