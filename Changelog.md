@@ -1,3 +1,9 @@
+## 2.1.0
+* Added Features
+  * Allow manual selection of the library to compile files into 
+* Bugfixes
+  * Reorder actions to allow removing and re-adding clock interfaces (useful if vivado wrongly auto-detects associations of clocks to bus-interfaces)
+
 ## 2.0.0
 * First Open Source Release (older versions not kept in history)
 * Changes
