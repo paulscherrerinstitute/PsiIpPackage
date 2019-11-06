@@ -8,6 +8,7 @@ This library is published under [PSI HDL Library License](License.txt), which is
 
 ## Detailed Documentation
 See [Command Reference](CommandRef.md)
+See [Tips](Tips.md)
 
 ## Changelog
 See [Changelog](Changelog.md)
