@@ -339,11 +339,15 @@ namespace export add_clock_in_interface
 # @param tgtDir		Target directory to package the IP into
 # @param edit 		[Optional] pass True to leave the IP packager GUI open for checking results etc.
 # @param synth		[Optional] pass True to run a test syncthesis to verify vivado can synthesize the core
-# @param part 		[Optional] Xilinx part number to do the test synthesis for (artix 7 by default)
-proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
-	#create project
-	create_project -force package_prj ./package_prj -part $part
-	
+# @param part 		[Optional] Xilinx part number to do the test synthesis for (artix 7 by vivado default)
+proc package {tgtDir {edit false} {synth false} {part ""}} {
+	#create project, use default part defined by vivado when not specified:
+	if {$part == ""} {
+		create_project -force package_prj ./package_prj 
+	} else {
+		create_project -force package_prj ./package_prj -part $part
+	}
+
 	###############################################################
 	# Project config
 	###############################################################	
@@ -614,7 +618,7 @@ proc package {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
 	puts "*** DONE ***"
 }
 #Wraper to prevent name clash with existing vivado command "package"
-proc package_ip {tgtDir {edit false} {synth false} {part xc7a200tsbg484-1}} {
+proc package_ip {tgtDir {edit false} {synth false} {part ""}} {
 	package $tgtDir $edit $synth $part
 }
 namespace export package_ip
