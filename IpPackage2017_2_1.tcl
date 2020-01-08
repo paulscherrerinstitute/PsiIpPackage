@@ -20,6 +20,7 @@ variable IpVersionUnderscore
 variable IpRevision
 variable IpName 
 variable IpLibrary
+variable IpVendor
 variable IpDescription
 variable SrcRelative
 variable LibRelative
@@ -53,6 +54,7 @@ proc init {name version revision library} {
 		variable IpRevision $revision
 	}	
 	variable IpLibrary $library
+	variable IpVendor "Paul Scherrer Institute"
 	variable IpVersionUnderscore
 	regsub -all {\.} $version {_} IpVersionUnderscore; list
 	variable SrcRelative [list]
@@ -81,6 +83,14 @@ proc set_description {desc} {
 	variable IpDescription $desc
 }
 namespace export set_description
+
+# Set the vendor of the IP-Core
+#
+# @param vendor		Vendor name
+proc set_vendor {vendor} {
+	variable IpVendor $vendor
+}
+namespace export set_vendor
 
 # Set the name of the top-entity (only required if Vivado cannot determine the top entity automatically)
 #
@@ -403,6 +413,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable IpDescription
 	variable IpVersion 
 	variable IpName
+	variable IpVendor
 	variable DefaultVhdlLib
 	puts "*** Set IP properties ***"
 	#Having unreferenced files is not allowed (leads to problems in the script). Therefore the warning is promoted to an error.
@@ -413,7 +424,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	set_property library $IpLibrary [ipx::current_core]
 	set_property display_name $DefaultVhdlLib [ipx::current_core]
 	set_property description $IpDescription [ipx::current_core]
-	set_property vendor_display_name "Paul Scherrer Institut" [ipx::current_core]
+	set_property vendor_display_name $IpVendor [ipx::current_core]
 	set_property company_url "http://www.psi.ch" [ipx::current_core]
 	set_property version $IpVersion [ipx::current_core]
 	set_property supported_families {	artix7 Production virtex7 Beta qvirtex7 Beta kintex7 Beta kintex7l Beta qkintex7 Beta qkintex7l \
