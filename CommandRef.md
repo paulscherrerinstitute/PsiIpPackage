@@ -15,6 +15,7 @@ namespace import psi::ip_package::latest::*
  * [init](#init)  
 * Configuration Commands
  * [set_description](#set_description) 
+ * [set_vendor](#set_vendor) 
  * [set_logo_relative](#set_logo_relative) 
  * [set_datasheet_relative](#set_datasheet_relative)
  * [set_top_entity](#set_top_entity)
@@ -102,6 +103,34 @@ Set the description of the IP-Core that is shown in Vivado.
       <td> desc </td>
       <td> No </td>
       <td> Description of the IP-Core </td>
+    </tr>
+</table>
+
+### set_vendor
+**Usage**
+
+```
+set_vendor <vendor>
+```
+
+**Description**
+
+Set the vendor of the IP-Core that is shown in Vivado.
+
+This command is optional. If it is not used, the vendor name is set to \"Paul Scherrer Institute\". This is chosen this way to make the code
+fully reverse compatible.
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> vendor </td>
+      <td> No </td>
+      <td> Vendor of the IP-Core </td>
     </tr>
 </table>
 
