@@ -16,6 +16,8 @@ namespace import psi::ip_package::latest::*
 * Configuration Commands
  * [set_description](#set_description) 
  * [set_vendor](#set_vendor) 
+ * [set_vendor_short](#set_vendor_short)
+ * [set_vendor_url](#set_vendor_url)
  * [set_logo_relative](#set_logo_relative) 
  * [set_datasheet_relative](#set_datasheet_relative)
  * [set_top_entity](#set_top_entity)
@@ -131,6 +133,62 @@ fully reverse compatible.
       <td> vendor </td>
       <td> No </td>
       <td> Vendor of the IP-Core </td>
+    </tr>
+</table>
+
+### set_vendor_short
+**Usage**
+
+```
+set_vendor_short <vendor>
+```
+
+**Description**
+
+Set the vendor abbreviation of the IP-Core that is shown in Vivado. Note that hte vendor abbreviation is not allowed to contain any whitespaces.
+
+This command is optional. If it is not used, the vendor abbreviation is set to \"psi.ch\". This is chosen this way to make the code
+fully reverse compatible.
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> vendor </td>
+      <td> No </td>
+      <td> Vendor abbreviation (no whitespaces allowed) </td>
+    </tr>
+</table>
+
+### set_vendor_url
+**Usage**
+
+```
+set_vendor_url <url>
+```
+
+**Description**
+
+Set the vendor URL of the IP-Core that is shown in Vivado.
+
+This command is optional. If it is not used, the vendor url is set to \"www.psi.ch\". This is chosen this way to make the code
+fully reverse compatible.
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> url </td>
+      <td> No </td>
+      <td> Vendor URL of the IP-Core </td>
     </tr>
 </table>
 

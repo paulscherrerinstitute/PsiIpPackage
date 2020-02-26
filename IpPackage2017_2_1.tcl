@@ -21,6 +21,8 @@ variable IpRevision
 variable IpName 
 variable IpLibrary
 variable IpVendor
+variable IpVendorShort
+variable IpVendorUrl
 variable IpDescription
 variable SrcRelative
 variable LibRelative
@@ -55,6 +57,8 @@ proc init {name version revision library} {
 	}	
 	variable IpLibrary $library
 	variable IpVendor "Paul Scherrer Institute"
+	variable IpVendorUrl "http://www.psi.ch"
+	variable IpVendorShort "psi.ch"
 	variable IpVersionUnderscore
 	regsub -all {\.} $version {_} IpVersionUnderscore; list
 	variable SrcRelative [list]
@@ -91,6 +95,22 @@ proc set_vendor {vendor} {
 	variable IpVendor $vendor
 }
 namespace export set_vendor
+
+# Set the vendor abbreviation of the IP-Core
+#
+# @param vendor		Vendor abbreviation (must contain no whitespaces)
+proc set_vendor_short {vendor} {
+	variable IpVendorShort $vendor
+}
+namespace export set_vendor_short
+
+# Set the vendor URL of the IP-Core
+#
+# @param url		Vendor URL
+proc set_vendor_url {url} {
+	variable IpVendorUrl $url
+}
+namespace export set_vendor_url
 
 # Set the name of the top-entity (only required if Vivado cannot determine the top entity automatically)
 #
@@ -414,18 +434,20 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable IpVersion 
 	variable IpName
 	variable IpVendor
+	variable IpVendorShort
+	variable IpVendorUrl
 	variable DefaultVhdlLib
 	puts "*** Set IP properties ***"
 	#Having unreferenced files is not allowed (leads to problems in the script). Therefore the warning is promoted to an error.
 	set_msg_config -id  {[IP_Flow 19-3833]} -new_severity "ERROR"
 	ipx::package_project -root_dir $tgtDir -taxonomy /UserIP
-	set_property vendor "psi.ch" [ipx::current_core]
+	set_property vendor $IpVendorShort [ipx::current_core]
 	set_property name $IpName [ipx::current_core]
 	set_property library $IpLibrary [ipx::current_core]
 	set_property display_name $DefaultVhdlLib [ipx::current_core]
 	set_property description $IpDescription [ipx::current_core]
 	set_property vendor_display_name $IpVendor [ipx::current_core]
-	set_property company_url "http://www.psi.ch" [ipx::current_core]
+	set_property company_url $IpVendorUrl [ipx::current_core]
 	set_property version $IpVersion [ipx::current_core]
 	set_property supported_families {	artix7 Production virtex7 Beta qvirtex7 Beta kintex7 Beta kintex7l Beta qkintex7 Beta qkintex7l \
 										Beta artix7 Beta artix7l Beta aartix7 Beta qartix7 Beta zynq Beta qzynq Beta azynq Beta spartan7 Beta \
