@@ -139,8 +139,12 @@ namespace export set_datasheet_relative
 # Add source files that are referenced to relatively
 #
 # @param srcs		List containing the source file paths relative to execution director
-# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
-proc add_sources_relative {srcs {lib "NONE"}} {
+# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>).
+#					"NONE" can be used to compile the files into the default library.
+# @param type		Vivado file type (common values "VHDL" or "VHDL 2008". If "NONE" is passed, vivado detects
+#					file type automatically. However, for VHDL 2008 this option must be used explicitly (vivado
+#					auto detection fails).
+proc add_sources_relative {srcs {lib "NONE"} {type "NONE"}} {
 	variable SrcRelative 
 	variable DefaultVhdlLib
 	variable srcFile [dict create]
@@ -151,6 +155,7 @@ proc add_sources_relative {srcs {lib "NONE"}} {
 		} else {
 			dict set srcFile LIBRARY $lib
 		}
+		dict set srcFile TYPE $type
 		lappend SrcRelative $srcFile
 	}
 }
@@ -180,7 +185,11 @@ namespace export add_drivers_relative
 # @param libPath	Relative path to the common library director of all files 
 # @param files		List containing the file paths within the library
 # @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
-proc add_lib_relative {libPath files {lib "NONE"}} {
+#					"NONE" can be used to compile the files into the default library.
+# @param type		Vivado file type (common values "VHDL" or "VHDL 2008". If "NONE" is passed, vivado detects
+#					file type automatically. However, for VHDL 2008 this option must be used explicitly (vivado
+#					auto detection fails).
+proc add_lib_relative {libPath files {lib "NONE"} {type "NONE"}} {
 	variable LibRelative
 	variable DefaultVhdlLib
 	foreach file $files {
@@ -191,6 +200,7 @@ proc add_lib_relative {libPath files {lib "NONE"}} {
 		} else {
 			dict set libFile LIBRARY $lib
 		}
+		dict set libFile TYPE $type
 		lappend LibRelative $libFile
 	}
 }
@@ -202,7 +212,11 @@ namespace export add_lib_relative
 # @param libPath	Relative path to the common library director of all files 
 # @param files		List containing the file paths within the library directory
 # @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
-proc add_lib_copied {tgtPath libPath files {lib "NONE"}} {
+#					"NONE" can be used to compile the files into the default library.
+# @param type		Vivado file type (common values "VHDL" or "VHDL 2008". If "NONE" is passed, vivado detects
+#					file type automatically. However, for VHDL 2008 this option must be used explicitly (vivado
+#					auto detection fails).
+proc add_lib_copied {tgtPath libPath files {lib "NONE"} {type "NONE"}} {
 	variable LibCopied
 	variable DefaultVhdlLib
 	foreach file $files {
@@ -214,6 +228,7 @@ proc add_lib_copied {tgtPath libPath files {lib "NONE"}} {
 		} else {
 			dict set copied LIBRARY $lib
 		}
+		dict set copied TYPE $type
 		lappend LibCopied $copied
 	}
 }
@@ -392,6 +407,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			puts $thisfile
 			add_files -norecurse $thisfile
 			set_property library [dict get $file LIBRARY] [get_files $thisfile]
+			variable fileType [dict get $file TYPE]
+			if {$fileType != "NONE"} {
+				set_property file_type $fileType [get_files $thisfile]
+			}
 		}
 	}
 	puts "*** Add relative library files to Project ***"
@@ -401,6 +420,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			puts $thisfile
 			add_files -norecurse $thisfile
 			set_property library [dict get $file LIBRARY] [get_files $thisfile]
+			variable fileType [dict get $file TYPE]
+			if {$fileType != "NONE"} {
+				set_property file_type $fileType [get_files $thisfile]
+			}
 		}		
 	}
 	
@@ -418,6 +441,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			file copy -force $srcPath $tgtPath
 			add_files -norecurse $tgtPath
 			set_property library [dict get $copied LIBRARY] [get_files $tgtPath]
+			variable fileType [dict get $file TYPE]
+			if {$fileType != "NONE"} {
+				set_property file_type $fileType [get_files $tgtPath]
+			}
 		}
 	}
 	

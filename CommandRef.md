@@ -271,7 +271,7 @@ Usually Vivado automatically detects the top entity name. If this works, the com
 **Usage**
 
 ```
-add_sources_relative <srcs> <lib>
+add_sources_relative <srcs> <lib> <type>
 ```
 
 **Description**
@@ -279,7 +279,9 @@ add_sources_relative <srcs> <lib>
 Add one or more source files to the IP-Core. Note that the source files are not copied into the IP-Core but
 referenced relatively because usually IP-Cores are delivered as GIT repository and already contain the sources.
 
-By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
+By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter. 
+
+By default the file type is determined by Vivado automatically. However, in some cases this fails (e.g. VHDL 2008 is not recognized, Vivado assumed VHDL 2002). In these cases it is useful to explicitly set the file type (e.g. to "VHDL 2008").
 
 **Parameters**
 <table>
@@ -296,7 +298,12 @@ By default all files are compiled into a library named accoding to the IP-Core n
     <tr>
       <td> lib </td>
       <td> Yes </td>
-      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted or "NONE" is passed. </td>
+    </tr>
+    <tr>
+      <td> type </td>
+      <td> Yes </td>
+      <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
     </tr>
 </table>
 
@@ -304,7 +311,7 @@ By default all files are compiled into a library named accoding to the IP-Core n
 **Usage**
 
 ```
-add_lib_relative <libPath> <files> <lib>
+add_lib_relative <libPath> <files> <lib> <type>
 ```
 
 **Description**
@@ -314,6 +321,8 @@ just links them using relative paths. As a result, in every project its own vers
 copy the library files into the IP-Core, use [add_lib_copied](add_lib_copied) .
 
 By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
+
+By default the file type is determined by Vivado automatically. However, in some cases this fails (e.g. VHDL 2008 is not recognized, Vivado assumed VHDL 2002). In these cases it is useful to explicitly set the file type (e.g. to "VHDL 2008").
 
 **Parameters**
 
@@ -336,7 +345,12 @@ By default all files are compiled into a library named accoding to the IP-Core n
     <tr>
       <td> lib </td>
       <td> Yes </td>
-      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted or "NONE" is passed. </td>
+    </tr>
+    <tr>
+      <td> type </td>
+      <td> Yes </td>
+      <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
     </tr>
 </table>
 
@@ -344,7 +358,7 @@ By default all files are compiled into a library named accoding to the IP-Core n
 **Usage**
 
 ```
-add_lib_copied <tgtPath> <libPath> <files> <lib>
+add_lib_copied <tgtPath> <libPath> <files> <lib> <type>
 ```
 
 **Description**
@@ -355,6 +369,8 @@ files are delivered as part of the IP-Core and it is not possible to easily find
 they represent.
 
 By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
+
+By default the file type is determined by Vivado automatically. However, in some cases this fails (e.g. VHDL 2008 is not recognized, Vivado assumed VHDL 2002). In these cases it is useful to explicitly set the file type (e.g. to "VHDL 2008").
 
 **Parameters**
 <table>
@@ -381,7 +397,12 @@ By default all files are compiled into a library named accoding to the IP-Core n
     <tr>
       <td> lib </td>
       <td> Yes </td>
-      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted or "NONE" is passed. </td>
+    </tr>
+    <tr>
+      <td> type </td>
+      <td> Yes </td>
+      <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
     </tr>
 </table>
 
