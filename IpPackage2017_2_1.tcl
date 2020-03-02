@@ -141,9 +141,7 @@ namespace export set_datasheet_relative
 # @param srcs		List containing the source file paths relative to execution director
 # @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>).
 #					"NONE" can be used to compile the files into the default library.
-# @param type		Vivado file type (common values "VHDL" or "VHDL 2008". If "NONE" is passed, vivado detects
-#					file type automatically. However, for VHDL 2008 this option must be used explicitly (vivado
-#					auto detection fails).
+# @param type		Override file type detected by vivado automatically. For VHDL, VHDL 2008 is used by default.
 proc add_sources_relative {srcs {lib "NONE"} {type "NONE"}} {
 	variable SrcRelative 
 	variable DefaultVhdlLib
@@ -155,7 +153,11 @@ proc add_sources_relative {srcs {lib "NONE"} {type "NONE"}} {
 		} else {
 			dict set srcFile LIBRARY $lib
 		}
+		#Use VHDL 2008 as default for all VHDL files
 		dict set srcFile TYPE $type
+		if {([string match "*.vhdl" $file] || [string match "*.vhd" $file]) && ($type == "NONE")} {
+			dict set srcFile TYPE "VHDL 2008"
+		}
 		lappend SrcRelative $srcFile
 	}
 }
@@ -186,9 +188,7 @@ namespace export add_drivers_relative
 # @param files		List containing the file paths within the library
 # @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
 #					"NONE" can be used to compile the files into the default library.
-# @param type		Vivado file type (common values "VHDL" or "VHDL 2008". If "NONE" is passed, vivado detects
-#					file type automatically. However, for VHDL 2008 this option must be used explicitly (vivado
-#					auto detection fails).
+# @param type		Override file type detected by vivado automatically. For VHDL, VHDL 2008 is used by default.
 proc add_lib_relative {libPath files {lib "NONE"} {type "NONE"}} {
 	variable LibRelative
 	variable DefaultVhdlLib
@@ -200,7 +200,11 @@ proc add_lib_relative {libPath files {lib "NONE"} {type "NONE"}} {
 		} else {
 			dict set libFile LIBRARY $lib
 		}
+		#Use VHDL 2008 as default for all VHDL files
 		dict set libFile TYPE $type
+		if {([string match "*.vhdl" $file] || [string match "*.vhd" $file]) && ($type == "NONE")} {
+			dict set libFile TYPE "VHDL 2008"
+		}
 		lappend LibRelative $libFile
 	}
 }
@@ -213,9 +217,7 @@ namespace export add_lib_relative
 # @param files		List containing the file paths within the library directory
 # @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
 #					"NONE" can be used to compile the files into the default library.
-# @param type		Vivado file type (common values "VHDL" or "VHDL 2008". If "NONE" is passed, vivado detects
-#					file type automatically. However, for VHDL 2008 this option must be used explicitly (vivado
-#					auto detection fails).
+# @param type		Override file type detected by vivado automatically. For VHDL, VHDL 2008 is used by default.
 proc add_lib_copied {tgtPath libPath files {lib "NONE"} {type "NONE"}} {
 	variable LibCopied
 	variable DefaultVhdlLib
@@ -228,7 +230,11 @@ proc add_lib_copied {tgtPath libPath files {lib "NONE"} {type "NONE"}} {
 		} else {
 			dict set copied LIBRARY $lib
 		}
+		#Use VHDL 2008 as default for all VHDL files
 		dict set copied TYPE $type
+		if {([string match "*.vhdl" $file] || [string match "*.vhd" $file]) && ($type == "NONE")} {
+			dict set copied TYPE "VHDL 2008"
+		}
 		lappend LibCopied $copied
 	}
 }

@@ -281,7 +281,7 @@ referenced relatively because usually IP-Cores are delivered as GIT repository a
 
 By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter. 
 
-By default the file type is determined by Vivado automatically. However, in some cases this fails (e.g. VHDL 2008 is not recognized, Vivado assumed VHDL 2002). In these cases it is useful to explicitly set the file type (e.g. to "VHDL 2008").
+By default the file type is determined by Vivado automatically but the auto detected type can be overwritten manually. For VHDL, VHDL 2008 is used by default.
 
 **Parameters**
 <table>
@@ -322,7 +322,7 @@ copy the library files into the IP-Core, use [add_lib_copied](add_lib_copied) .
 
 By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
 
-By default the file type is determined by Vivado automatically. However, in some cases this fails (e.g. VHDL 2008 is not recognized, Vivado assumed VHDL 2002). In these cases it is useful to explicitly set the file type (e.g. to "VHDL 2008").
+By default the file type is determined by Vivado automatically but the auto detected type can be overwritten manually. For VHDL, VHDL 2008 is used by default.
 
 **Parameters**
 
@@ -370,7 +370,7 @@ they represent.
 
 By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
 
-By default the file type is determined by Vivado automatically. However, in some cases this fails (e.g. VHDL 2008 is not recognized, Vivado assumed VHDL 2002). In these cases it is useful to explicitly set the file type (e.g. to "VHDL 2008").
+By default the file type is determined by Vivado automatically but the auto detected type can be overwritten manually. For VHDL, VHDL 2008 is used by default.
 
 **Parameters**
 <table>
