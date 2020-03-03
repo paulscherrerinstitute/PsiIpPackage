@@ -814,7 +814,7 @@ Additionally a test-synthesis can be ran to check if all files required are adde
     <tr>
       <td> part </td>
       <td> Yes </td>
-      <td> Xilinx part number to use for the test-synthesis. By default the Artix-7 *xc7a200tsbg484-1* is used. </td>
+      <td> Xilinx part number to use for the test-synthesis. By default Vivado chooses an available part. </td>
     </tr> 
 </table>
 
