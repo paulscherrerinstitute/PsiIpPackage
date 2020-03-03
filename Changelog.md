@@ -1,3 +1,8 @@
+## 2.2.0
+* Added Features
+  * VHDL 2008 support by default
+  * Added options to set vendor properties
+
 ## 2.1.0
 * Added Features
   * Allow manual selection of the library to compile files into 
@@ -68,3 +73,4 @@
 
 ## V1.00
 * First release
+
