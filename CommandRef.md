@@ -16,6 +16,8 @@ namespace import psi::ip_package::latest::*
 * Configuration Commands
  * [set_description](#set_description) 
  * [set_vendor](#set_vendor) 
+ * [set_vendor_short](#set_vendor_short)
+ * [set_vendor_url](#set_vendor_url)
  * [set_logo_relative](#set_logo_relative) 
  * [set_datasheet_relative](#set_datasheet_relative)
  * [set_top_entity](#set_top_entity)
@@ -134,6 +136,62 @@ fully reverse compatible.
     </tr>
 </table>
 
+### set_vendor_short
+**Usage**
+
+```
+set_vendor_short <vendor>
+```
+
+**Description**
+
+Set the vendor abbreviation of the IP-Core that is shown in Vivado. Note that hte vendor abbreviation is not allowed to contain any whitespaces.
+
+This command is optional. If it is not used, the vendor abbreviation is set to \"psi.ch\". This is chosen this way to make the code
+fully reverse compatible.
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> vendor </td>
+      <td> No </td>
+      <td> Vendor abbreviation (no whitespaces allowed) </td>
+    </tr>
+</table>
+
+### set_vendor_url
+**Usage**
+
+```
+set_vendor_url <url>
+```
+
+**Description**
+
+Set the vendor URL of the IP-Core that is shown in Vivado.
+
+This command is optional. If it is not used, the vendor url is set to \"www.psi.ch\". This is chosen this way to make the code
+fully reverse compatible.
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> url </td>
+      <td> No </td>
+      <td> Vendor URL of the IP-Core </td>
+    </tr>
+</table>
+
 ### set_logo_relative
 **Usage**
 
@@ -213,7 +271,7 @@ Usually Vivado automatically detects the top entity name. If this works, the com
 **Usage**
 
 ```
-add_sources_relative <srcs> <lib>
+add_sources_relative <srcs> <lib> <type>
 ```
 
 **Description**
@@ -221,7 +279,9 @@ add_sources_relative <srcs> <lib>
 Add one or more source files to the IP-Core. Note that the source files are not copied into the IP-Core but
 referenced relatively because usually IP-Cores are delivered as GIT repository and already contain the sources.
 
-By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
+By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter. 
+
+By default the file type is determined by Vivado automatically but the auto detected type can be overwritten manually. For VHDL, VHDL 2008 is used by default.
 
 **Parameters**
 <table>
@@ -238,7 +298,12 @@ By default all files are compiled into a library named accoding to the IP-Core n
     <tr>
       <td> lib </td>
       <td> Yes </td>
-      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted or "NONE" is passed. </td>
+    </tr>
+    <tr>
+      <td> type </td>
+      <td> Yes </td>
+      <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
     </tr>
 </table>
 
@@ -246,7 +311,7 @@ By default all files are compiled into a library named accoding to the IP-Core n
 **Usage**
 
 ```
-add_lib_relative <libPath> <files> <lib>
+add_lib_relative <libPath> <files> <lib> <type>
 ```
 
 **Description**
@@ -256,6 +321,8 @@ just links them using relative paths. As a result, in every project its own vers
 copy the library files into the IP-Core, use [add_lib_copied](add_lib_copied) .
 
 By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
+
+By default the file type is determined by Vivado automatically but the auto detected type can be overwritten manually. For VHDL, VHDL 2008 is used by default.
 
 **Parameters**
 
@@ -278,7 +345,12 @@ By default all files are compiled into a library named accoding to the IP-Core n
     <tr>
       <td> lib </td>
       <td> Yes </td>
-      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted or "NONE" is passed. </td>
+    </tr>
+    <tr>
+      <td> type </td>
+      <td> Yes </td>
+      <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
     </tr>
 </table>
 
@@ -286,7 +358,7 @@ By default all files are compiled into a library named accoding to the IP-Core n
 **Usage**
 
 ```
-add_lib_copied <tgtPath> <libPath> <files> <lib>
+add_lib_copied <tgtPath> <libPath> <files> <lib> <type>
 ```
 
 **Description**
@@ -297,6 +369,8 @@ files are delivered as part of the IP-Core and it is not possible to easily find
 they represent.
 
 By default all files are compiled into a library named accoding to the IP-Core name and version but the user can optionally choose a different library using the *lib* parameter.
+
+By default the file type is determined by Vivado automatically but the auto detected type can be overwritten manually. For VHDL, VHDL 2008 is used by default.
 
 **Parameters**
 <table>
@@ -323,7 +397,12 @@ By default all files are compiled into a library named accoding to the IP-Core n
     <tr>
       <td> lib </td>
       <td> Yes </td>
-      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted or "NONE" is passed. </td>
+    </tr>
+    <tr>
+      <td> type </td>
+      <td> Yes </td>
+      <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
     </tr>
 </table>
 

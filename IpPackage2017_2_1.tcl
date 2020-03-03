@@ -21,6 +21,8 @@ variable IpRevision
 variable IpName 
 variable IpLibrary
 variable IpVendor
+variable IpVendorShort
+variable IpVendorUrl
 variable IpDescription
 variable SrcRelative
 variable LibRelative
@@ -55,6 +57,8 @@ proc init {name version revision library} {
 	}	
 	variable IpLibrary $library
 	variable IpVendor "Paul Scherrer Institute"
+	variable IpVendorUrl "http://www.psi.ch"
+	variable IpVendorShort "psi.ch"
 	variable IpVersionUnderscore
 	regsub -all {\.} $version {_} IpVersionUnderscore; list
 	variable SrcRelative [list]
@@ -92,6 +96,22 @@ proc set_vendor {vendor} {
 }
 namespace export set_vendor
 
+# Set the vendor abbreviation of the IP-Core
+#
+# @param vendor		Vendor abbreviation (must contain no whitespaces)
+proc set_vendor_short {vendor} {
+	variable IpVendorShort $vendor
+}
+namespace export set_vendor_short
+
+# Set the vendor URL of the IP-Core
+#
+# @param url		Vendor URL
+proc set_vendor_url {url} {
+	variable IpVendorUrl $url
+}
+namespace export set_vendor_url
+
 # Set the name of the top-entity (only required if Vivado cannot determine the top entity automatically)
 #
 # @param name		Name of the top entity
@@ -119,8 +139,10 @@ namespace export set_datasheet_relative
 # Add source files that are referenced to relatively
 #
 # @param srcs		List containing the source file paths relative to execution director
-# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
-proc add_sources_relative {srcs {lib "NONE"}} {
+# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>).
+#					"NONE" can be used to compile the files into the default library.
+# @param type		Override file type detected by vivado automatically. For VHDL, VHDL 2008 is used by default.
+proc add_sources_relative {srcs {lib "NONE"} {type "NONE"}} {
 	variable SrcRelative 
 	variable DefaultVhdlLib
 	variable srcFile [dict create]
@@ -130,6 +152,11 @@ proc add_sources_relative {srcs {lib "NONE"}} {
 			dict set srcFile LIBRARY $DefaultVhdlLib
 		} else {
 			dict set srcFile LIBRARY $lib
+		}
+		#Use VHDL 2008 as default for all VHDL files
+		dict set srcFile TYPE $type
+		if {([string match "*.vhdl" $file] || [string match "*.vhd" $file]) && ($type == "NONE")} {
+			dict set srcFile TYPE "VHDL 2008"
 		}
 		lappend SrcRelative $srcFile
 	}
@@ -160,7 +187,9 @@ namespace export add_drivers_relative
 # @param libPath	Relative path to the common library director of all files 
 # @param files		List containing the file paths within the library
 # @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
-proc add_lib_relative {libPath files {lib "NONE"}} {
+#					"NONE" can be used to compile the files into the default library.
+# @param type		Override file type detected by vivado automatically. For VHDL, VHDL 2008 is used by default.
+proc add_lib_relative {libPath files {lib "NONE"} {type "NONE"}} {
 	variable LibRelative
 	variable DefaultVhdlLib
 	foreach file $files {
@@ -170,6 +199,11 @@ proc add_lib_relative {libPath files {lib "NONE"}} {
 			dict set libFile LIBRARY $DefaultVhdlLib
 		} else {
 			dict set libFile LIBRARY $lib
+		}
+		#Use VHDL 2008 as default for all VHDL files
+		dict set libFile TYPE $type
+		if {([string match "*.vhdl" $file] || [string match "*.vhd" $file]) && ($type == "NONE")} {
+			dict set libFile TYPE "VHDL 2008"
 		}
 		lappend LibRelative $libFile
 	}
@@ -182,7 +216,9 @@ namespace export add_lib_relative
 # @param libPath	Relative path to the common library director of all files 
 # @param files		List containing the file paths within the library directory
 # @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
-proc add_lib_copied {tgtPath libPath files {lib "NONE"}} {
+#					"NONE" can be used to compile the files into the default library.
+# @param type		Override file type detected by vivado automatically. For VHDL, VHDL 2008 is used by default.
+proc add_lib_copied {tgtPath libPath files {lib "NONE"} {type "NONE"}} {
 	variable LibCopied
 	variable DefaultVhdlLib
 	foreach file $files {
@@ -193,6 +229,11 @@ proc add_lib_copied {tgtPath libPath files {lib "NONE"}} {
 			dict set copied LIBRARY $DefaultVhdlLib
 		} else {
 			dict set copied LIBRARY $lib
+		}
+		#Use VHDL 2008 as default for all VHDL files
+		dict set copied TYPE $type
+		if {([string match "*.vhdl" $file] || [string match "*.vhd" $file]) && ($type == "NONE")} {
+			dict set copied TYPE "VHDL 2008"
 		}
 		lappend LibCopied $copied
 	}
@@ -372,6 +413,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			puts $thisfile
 			add_files -norecurse $thisfile
 			set_property library [dict get $file LIBRARY] [get_files $thisfile]
+			variable fileType [dict get $file TYPE]
+			if {$fileType != "NONE"} {
+				set_property file_type $fileType [get_files $thisfile]
+			}
 		}
 	}
 	puts "*** Add relative library files to Project ***"
@@ -381,6 +426,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			puts $thisfile
 			add_files -norecurse $thisfile
 			set_property library [dict get $file LIBRARY] [get_files $thisfile]
+			variable fileType [dict get $file TYPE]
+			if {$fileType != "NONE"} {
+				set_property file_type $fileType [get_files $thisfile]
+			}
 		}		
 	}
 	
@@ -398,6 +447,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			file copy -force $srcPath $tgtPath
 			add_files -norecurse $tgtPath
 			set_property library [dict get $copied LIBRARY] [get_files $tgtPath]
+			variable fileType [dict get $file TYPE]
+			if {$fileType != "NONE"} {
+				set_property file_type $fileType [get_files $tgtPath]
+			}
 		}
 	}
 	
@@ -414,18 +467,20 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable IpVersion 
 	variable IpName
 	variable IpVendor
+	variable IpVendorShort
+	variable IpVendorUrl
 	variable DefaultVhdlLib
 	puts "*** Set IP properties ***"
 	#Having unreferenced files is not allowed (leads to problems in the script). Therefore the warning is promoted to an error.
 	set_msg_config -id  {[IP_Flow 19-3833]} -new_severity "ERROR"
 	ipx::package_project -root_dir $tgtDir -taxonomy /UserIP
-	set_property vendor "psi.ch" [ipx::current_core]
+	set_property vendor $IpVendorShort [ipx::current_core]
 	set_property name $IpName [ipx::current_core]
 	set_property library $IpLibrary [ipx::current_core]
 	set_property display_name $DefaultVhdlLib [ipx::current_core]
 	set_property description $IpDescription [ipx::current_core]
 	set_property vendor_display_name $IpVendor [ipx::current_core]
-	set_property company_url "http://www.psi.ch" [ipx::current_core]
+	set_property company_url $IpVendorUrl [ipx::current_core]
 	set_property version $IpVersion [ipx::current_core]
 	set_property supported_families {	artix7 Production virtex7 Beta qvirtex7 Beta kintex7 Beta kintex7l Beta qkintex7 Beta qkintex7l \
 										Beta artix7 Beta artix7l Beta aartix7 Beta qartix7 Beta zynq Beta qzynq Beta azynq Beta spartan7 Beta \
