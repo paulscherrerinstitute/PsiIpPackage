@@ -37,6 +37,7 @@ namespace import psi::ip_package::latest::*
  * [add_clock_in_interface](#add_clock_in_interface)
  * [set_interface_clock](#set_interface_clock)
  * [add_drivers_relative](#add_drivers_relative)
+ * [set_interface_mode](#set_interface_mode)
 * Run Commands
  * [package_ip](#package_ip) 
  
@@ -469,7 +470,7 @@ By default parameters are shown as textboxes.
 **Usage**
 
 ```
-gui_create_user_parameter <paramName> <type> <initialValue>
+gui_create_user_parameter <paramName> <type> <initialValue> <displayName>
 ```
 
 **Description**
@@ -504,6 +505,11 @@ By default parameters are shown as textboxes.
       <td> No </td>
       <td> Type of the parameter. Possible values are: long, float, bool, bitString, String. </td>
     </tr>		
+    <tr>
+      <td> displayName </td>
+      <td> Yes </td>
+      <td> Text to display for the parameter in the GUI </td>
+    </tr>	
 </table>
 
 ### gui_parameter_set_widget_dropdown
@@ -771,6 +777,36 @@ The driver sources must be located in the folder *DRIVER_MAIN/src* due to Limita
       <td> files </td>
       <td> No </td>
       <td> List of driver source files (relative to *dir*) </td>
+    </tr>
+</table>
+
+### set_interface_mode
+**Usage**
+
+```
+set_interface_mode <interface> <mode>
+```
+
+**Description**
+
+Set the mode of an interface. Usually the mode is automatically detected by Vivado but in some cases (e.g. monitor interfaces) this does not always work reliably.
+
+**Parameters**  
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> interface </td>
+      <td> No </td>
+      <td> Name of the interface to set the mode for</td>
+    </tr>
+    <tr>
+      <td> mode </td>
+      <td> No </td>
+      <td> Interface mode to use (*master*, *slave* or *monitor*) </td>
     </tr>
 </table>
 

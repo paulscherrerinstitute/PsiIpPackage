@@ -34,6 +34,7 @@ variable CurrentParameter
 variable Logo
 variable DataSheet
 variable PortEnablementConditions
+variable PortInterfaceModes
 variable InterfaceEnablementConditions
 variable RemoveAutoIf
 variable DriverDir
@@ -67,6 +68,7 @@ proc init {name version revision library} {
 	variable GuiPages [list]
 	variable GuiParameters [list]
 	variable PortEnablementConditions [list]
+	variable PortInterfaceModes [list]
 	variable InterfaceEnablementConditions [list]
 	variable RemoveAutoIf [list]
 	variable IfClocks [list]
@@ -363,6 +365,19 @@ proc add_port_enablement_condition {port condition} {
 }
 namespace export add_port_enablement_condition
 
+# Set the interface mode for an interface
+#
+# @param interface	Interface to set the mode for
+# @param mode		Interface mode (master, slave or monitor)
+proc set_interface_mode {interface mode} {
+	variable PortInterfaceModes
+	variable Mode [dict create]
+	dict set Mode INTERFACE $interface
+	dict set Mode MODE $mode
+	lappend PortInterfaceModes $Mode
+}
+namespace export set_interface_mode
+
 # Add an enablement condition for an interface
 #
 # @param interface	Interfaces to add enablement condition for (wildcards etc. allowed). Example : "Adc_*" 
@@ -577,13 +592,21 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		set_property enablement_dependency [dict get $cond CONDITION] [ipx::get_ports [dict get $cond PORT] -of_objects [ipx::current_core]]
 		set_property driver_value 0 [ipx::get_ports [dict get $cond PORT] -of_objects [ipx::current_core]]
 	}
-	
+
 	#Handle optional interfaces
 	puts "*** Handle optional interfaces ***"
 	variable InterfaceEnablementConditions
 	foreach cond $InterfaceEnablementConditions {
 		set_property enablement_dependency [dict get $cond CONDITION] [ipx::get_bus_interfaces [dict get $cond INTERFACE] -of_objects [ipx::current_core]]
 	}	
+	
+	#Handle interface modes
+	puts "*** Handle interface modes ***"
+	variable PortInterfaceModes
+	foreach ifModes $PortInterfaceModes {
+		puts "set_property interface_mode [dict get $ifModes MODE] ipx::get_ports [dict get $ifModes INTERFACE] -of_objects [ipx::current_core]"
+		set_property interface_mode [dict get $ifModes MODE] [ipx::get_bus_interfaces [dict get $ifModes INTERFACE] -of_objects [ipx::current_core]]
+	}
 	
 	#Set interface clocks
 	puts "*** Set Interface Clocks ***"
