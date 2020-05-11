@@ -501,12 +501,13 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 										Beta artix7 Beta artix7l Beta aartix7 Beta qartix7 Beta zynq Beta qzynq Beta azynq Beta spartan7 Beta \
 										aspartan7 Beta virtexu Beta virtexuplus Beta kintexuplus Beta zynquplus Beta kintexu Beta} [ipx::current_core]	
 	
-	#Make Library Paths Relative
-	puts "*** Convert library paths to relative paths ***"
-	foreach file $LibRelative {
-		variable fileName [dict get $file SRC_PATH]
-		foreach fileset {xilinx_anylanguagesynthesis xilinx_anylanguagebehavioralsimulation} {
-			set_property name [psi::util::path::relTo $tgtDir $fileName] [ipx::get_files */[file tail $fileName] -of_objects [ipx::get_file_groups $fileset -of_objects [ipx::current_core]]]
+    #Make File Group Paths Relative
+	puts "*** Convert all File Group paths to relative paths ***"
+	foreach obj [ipx::get_files -of_objects [ipx::get_file_groups * -of_objects [ipx::current_core]]] {
+        set file [get_property name $obj]
+        if {[file pathtype $file] != "relative"} {
+            # puts "ABS: $file => REL: [psi::util::path::relTo $tgtDir $file false]"
+			set_property name [psi::util::path::relTo $tgtDir $file false] $obj
 		}
 	}
 	
