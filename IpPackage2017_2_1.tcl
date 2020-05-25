@@ -299,6 +299,9 @@ proc gui_create_parameter {vhdlName displayName} {
 	dict set CurrentParameter VALUES {}
 	dict set CurrentParameter WIDGET "text"	
 	dict set CurrentParameter EXPRESSION "None"
+	dict set CurrentParameter TEXTBELOW "None"
+	dict set CurrentParameter ENABLEMENTDEF "None"
+	dict set CurrentParameter ENABLEMENTDEP "None"
 }
 namespace export gui_create_parameter
 
@@ -325,6 +328,9 @@ proc gui_create_user_parameter {paramName type initialValue {displayName "None"}
 	dict set CurrentParameter TYPE $type
 	dict set CurrentParameter INITIAL $initialValue
 	dict set CurrentParameter EXPRESSION "None"
+	dict set CurrentParameter TEXTBELOW "None"
+	dict set CurrentParameter ENABLEMENTDEF "None"
+	dict set CurrentParameter ENABLEMENTDEP "None"
 }
 namespace export gui_create_user_parameter
 
@@ -367,7 +373,26 @@ proc gui_parameter_set_expression {expression} {
 	dict set CurrentParameter EXPRESSION $expression
 }
 namespace export gui_parameter_set_expression
+
+# Set enablement dependency of the user parameter
+#
+# @param expression	Expression (parameter is enabled if it evaluates to true) e.g. {$Channels_g > 2"}
+# @param default	Default enablement of the parameter
+proc gui_parameter_set_enablement {expression default} {
+	variable CurrentParameter
+	dict set CurrentParameter ENABLEMENTDEF $default
+	dict set CurrentParameter ENABLEMENTDEP $expression
+}
+namespace export gui_parameter_set_enablement
 	
+# Add text below the current parameter
+#
+# @param text		Text to place below the parameter
+proc gui_parameter_text_below {text} {
+	variable CurrentParameter
+	dict set CurrentParameter TEXTBELOW $text
+}
+namespace export gui_parameter_text_below
 
 # Add the current parameter to the current gui page
 proc gui_add_parameter {} {
@@ -596,11 +621,23 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			set_property value_validation_range_minimum [lindex $Values 0] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 			set_property value_validation_range_maximum [lindex $Values 1] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 		}
+		#Enablement dependency
+		set EnablementDep [dict get $param ENABLEMENTDEP]
+		set EnablementDef [dict get $param ENABLEMENTDEF]
+		if {$EnablementDep != "None"} {
+			set_property enablement_value $EnablementDef [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+			set_property enablement_tcl_expr $EnablementDep [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+		}
 		#Expression
 		set ParamExpr [dict get $param EXPRESSION]
 		if {$ParamExpr != "None"} {
 			set_property value_tcl_expr $ParamExpr [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 			set_property enablement_value false [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+		}
+		#Text Below
+		set text [dict get $param TEXTBELOW]
+		if {$text != "None"} {
+			ipgui::add_static_text -name "$ParamName\_TextBelow" -component [ipx::current_core] -parent [ipgui::get_pagespec -name [dict get $param PAGE] -component [ipx::current_core] ] -text $text
 		}
 	}
 	

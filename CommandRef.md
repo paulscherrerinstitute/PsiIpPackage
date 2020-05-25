@@ -32,6 +32,8 @@ namespace import psi::ip_package::latest::*
  * [gui_parameter_set_widget_checkbox](#gui_parameter_set_widget_checkbox) 
  * [gui_parameter_set_range](#gui_parameter_set_range) 
  * [gui_parameter_set_expression](#gui_parameter_set_expression)
+ * [gui_parameter_set_enablement](#gui_parameter_set_enablement)
+ * [gui_parameter_text_below](#gui_parameter_text_below)
  * [gui_add_parameter](#gui_add_parameter) 
  * [add_port_enablement_condition](#add_port_enablement_condition) 
  * [add_interface_enablement_condition](#add_interface_enablement_condition)
@@ -641,6 +643,61 @@ and [gui_add_parameter](#gui_add_parameter) for a given parameter. It configures
       <td> max </td>
       <td> No </td>
       <td> Upper bound of the valid range </td>
+    </tr>		
+</table>
+
+### gui_parameter_set_enablement
+**Usage**
+
+```
+gui_parameter_set_enablement <expr> <defauult> 
+```
+
+**Description**
+
+This command allows setting the enablement behavior of a parameter. Disabled parameters are greyed out and not editable.
+
+**Parameters**  
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> expr </td>
+      <td> No </td>
+      <td> Expression in curly braces (e.g. *{Channels_g>3}*) </td>
+    </tr>	
+    <tr>
+      <td> default </td>
+      <td> No </td>
+      <td> Default state of parameter enablement </td>
+    </tr>		
+</table>
+
+### gui_parameter_text_below
+**Usage**
+
+```
+gui_parameter_text_below <text>
+```
+
+**Description**
+
+Add an explanatory text below a parameter.
+
+**Parameters**  
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> text </td>
+      <td> No </td>
+      <td> Text to place below the parameter </td>
     </tr>		
 </table>
 
