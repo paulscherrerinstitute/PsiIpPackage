@@ -25,11 +25,13 @@ namespace import psi::ip_package::latest::*
  * [add_lib_relative](#add_lib_relative) 
  * [add_lib_copied](add_lib_copied) 
  * [gui_add_page](#gui_add_page) 
+ * [add_gui_support_tcl](#add_gui_support_tcl)
  * [gui_create_parameter](#gui_create_parameter) 
  * [gui_create_user_parameter](#gui_create_user_parameter) 
  * [gui_parameter_set_widget_dropdown](#gui_parameter_set_widget_dropdown) 
  * [gui_parameter_set_widget_checkbox](#gui_parameter_set_widget_checkbox) 
  * [gui_parameter_set_range](#gui_parameter_set_range) 
+ * [gui_parameter_set_expression](#gui_parameter_set_expression)
  * [gui_add_parameter](#gui_add_parameter) 
  * [add_port_enablement_condition](#add_port_enablement_condition) 
  * [add_interface_enablement_condition](#add_interface_enablement_condition)
@@ -405,6 +407,62 @@ By default the file type is determined by Vivado automatically but the auto dete
       <td> Yes </td>
       <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
     </tr>
+</table>
+
+### add_gui_support_tcl
+
+**Usage**
+```
+add_gui_support_tcl <script> 
+```
+
+**Description**
+Somtimes it is useful being able to use custom TCL procedures in parameter calculations within the IP customization GUI. To do so, you can add a script containing these procedures using this command.
+
+Be aware that some quirks of the Vivado GUI lead to the situation that the custom TCL procedures work with the packaged IP but they report errors in the preview within the IP packager.
+
+**Parameters**
+
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> script </td>
+      <td> No </td>
+      <td> Path of the script to source (relative to the IP-main directory) </td>
+    </tr>		
+</table>
+
+### gui_parameter_set_expression
+
+**Usage**
+```
+gui_parameter_set_expression <expression> 
+```
+
+**Description**
+Instead of letting the user set a parameter, this command forces the parameter to be calculated basedon an expression. It is alos possible to reference otehr parameters (e.g. using the expression *{$Channels_g > 3}*).
+
+Note that the expression must be passed in curly braces.
+
+If you want to use more complex expressions, have a look at the command [add_gui_support_tcl](#add_gui_support_tcl) 
+
+**Parameters**
+
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> expression </td>
+      <td> No </td>
+      <td> Expression to calculate the paramter </td>
+    </tr>		
 </table>
 
 ### gui_add_page

@@ -41,6 +41,7 @@ variable DriverDir
 variable DriverFiles
 variable ClockInputs
 variable DefaultVhdlLib
+variable GuiSupportTcl
 
 # Initialize IP Packaging process
 #
@@ -79,6 +80,7 @@ proc init {name version revision library} {
 	variable TopEntity "None"
 	variable ClockInputs [list]
 	variable DefaultVhdlLib $IpName\_$IpVersionUnderscore
+	variable GuiSupportTcl [list]
 }
 namespace export init
 
@@ -242,6 +244,15 @@ proc add_lib_copied {tgtPath libPath files {lib "NONE"} {type "NONE"}} {
 }
 namespace export add_lib_copied
 
+# Add GUI support TCL script containing procedures to be used in parameter calculations
+#
+# @param script		Path to the GUI script (relative to the IP directory)
+proc add_gui_support_tcl {script} {
+	variable GuiSupportTcl
+	lappend GuiSupportTcl $script
+}
+namespace export add_gui_support_tcl
+
 # Add a page to the GUI
 #
 # @param name		Name of the new GUI page
@@ -287,6 +298,7 @@ proc gui_create_parameter {vhdlName displayName} {
 	dict set CurrentParameter VALIDATION  "None"
 	dict set CurrentParameter VALUES {}
 	dict set CurrentParameter WIDGET "text"	
+	dict set CurrentParameter EXPRESSION "None"
 }
 namespace export gui_create_parameter
 
@@ -312,6 +324,7 @@ proc gui_create_user_parameter {paramName type initialValue {displayName "None"}
 	dict set CurrentParameter WIDGET "text"	
 	dict set CurrentParameter TYPE $type
 	dict set CurrentParameter INITIAL $initialValue
+	dict set CurrentParameter EXPRESSION "None"
 }
 namespace export gui_create_user_parameter
 
@@ -343,6 +356,18 @@ proc gui_parameter_set_range {min max} {
 	dict set CurrentParameter VALUES [list $min $max]
 }
 namespace export gui_parameter_set_range
+	variable CurrentParameter
+	
+
+# Calculate the value of a prameter from an expression (instead of user input)
+#
+# @param expression		Expression to use (e.g. {$Channels_g > 2"}
+proc gui_parameter_set_expression {expression} {
+	variable CurrentParameter
+	dict set CurrentParameter EXPRESSION $expression
+}
+namespace export gui_parameter_set_expression
+	
 
 # Add the current parameter to the current gui page
 proc gui_add_parameter {} {
@@ -412,6 +437,15 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		create_project -force package_prj ./package_prj 
 	} else {
 		create_project -force package_prj ./package_prj -part $part
+	}
+	
+	#Source GUI support TCL scripts
+	variable GuiSupportTcl
+	foreach script $GuiSupportTcl {
+		set ::script $script
+		namespace eval "::" {
+			source "../$script"
+		}
 	}
 
 	###############################################################
@@ -562,6 +596,12 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			set_property value_validation_range_minimum [lindex $Values 0] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 			set_property value_validation_range_maximum [lindex $Values 1] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 		}
+		#Expression
+		set ParamExpr [dict get $param EXPRESSION]
+		if {$ParamExpr != "None"} {
+			set_property value_tcl_expr $ParamExpr [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+			set_property enablement_value false [ipx::get_user_parameters Test -of_objects [ipx::current_core]]
+		}
 	}
 	
 	#Remove autodetected interfaces
@@ -704,6 +744,24 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	
 	#close project
 	close_project
+	
+	#Add GUI Support TCL files to generated file (there is no clean way to do this during packaging)
+	variable GuiSupportTcl
+	if {[llength $GuiSupportTcl] > 0} {
+		#Read file
+		set f [open [glob ../xgui/$IpName*.tcl] "r"]
+		set content [read $f]
+		close $f
+		
+		#Add line
+		set f [open [glob ../xgui/$IpName*.tcl] "w+"]
+		foreach script $GuiSupportTcl {
+			puts -nonewline $f {source [file join [file dirname [file dirname [info script]]]}
+			puts $f " $script]\n"
+		}
+		puts $f $content
+		close $f		
+	}
 	
 	puts "*** DONE ***"
 }
