@@ -361,7 +361,7 @@ namespace export gui_parameter_set_range
 
 # Calculate the value of a prameter from an expression (instead of user input)
 #
-# @param expression		Expression to use (e.g. {$Channels_g > 2"}
+# @param expression		Expression to use (e.g. {$Channels_g > 2"})
 proc gui_parameter_set_expression {expression} {
 	variable CurrentParameter
 	dict set CurrentParameter EXPRESSION $expression
@@ -600,7 +600,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		set ParamExpr [dict get $param EXPRESSION]
 		if {$ParamExpr != "None"} {
 			set_property value_tcl_expr $ParamExpr [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
-			set_property enablement_value false [ipx::get_user_parameters Test -of_objects [ipx::current_core]]
+			set_property enablement_value false [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 		}
 	}
 	
