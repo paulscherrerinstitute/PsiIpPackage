@@ -23,7 +23,8 @@ namespace import psi::ip_package::latest::*
  * [set_top_entity](#set_top_entity)
  * [add_sources_relative](#add_sources_relative) 
  * [add_lib_relative](#add_lib_relative) 
- * [add_lib_copied](add_lib_copied) 
+ * [add_lib_copied](#add_lib_copied) 
+ * [add_ttcl_vhd](#add_ttcl_vhd)
  * [gui_add_page](#gui_add_page) 
  * [add_gui_support_tcl](#add_gui_support_tcl)
  * [gui_create_parameter](#gui_create_parameter) 
@@ -38,22 +39,23 @@ namespace import psi::ip_package::latest::*
  * [add_port_enablement_condition](#add_port_enablement_condition) 
  * [add_interface_enablement_condition](#add_interface_enablement_condition)
  * [remove_autodetected_interface](#remove_autodetected_interface) 
+ * [remove_file_from_ip](#remove_file_from_ip)
  * [add_clock_in_interface](#add_clock_in_interface)
  * [set_interface_clock](#set_interface_clock)
  * [add_drivers_relative](#add_drivers_relative)
  * [set_interface_mode](#set_interface_mode)
 * Run Commands
  * [package_ip](#package_ip) 
- 
+
 ## General Commands
- 
+
 ### init
 **Usage**
 
 ```
 init <name> <version> <revision> <library>
 ```
- 
+
 **Description**
 
 This command initializes the PSI IP packaging module. It must be called as first command from this library
@@ -234,6 +236,7 @@ set_datasheet_relative <datasheet>
 Add a Datasheet to the IP-Core. The datasheet is not copied into the IP-Core but referenced relatively.
 
 **Parameters**  
+
 <table>
     <tr>
       <th width="200"><b>Parameter</b></th>
@@ -408,6 +411,43 @@ By default the file type is determined by Vivado automatically but the auto dete
       <td> type </td>
       <td> Yes </td>
       <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
+    </tr>
+</table>
+
+### add_ttcl_vhd
+**Usage**
+
+```
+add_ttcl_vhd <files> <lib>
+```
+
+**Description**
+
+Add one or more TTCL (template-TCL) files. The files must reside in a subfolder named *ttcl* of the IP-Core main directory. 
+
+TTCL can be used to generate VHDL source files when the IP-Core is generated. This is very useful for advanced parameter passing that
+exceeds the functionality supported by Vivado GUIs natively. 
+
+Note that for test synthesis during packaging, a prototype of the generatedfile must be added (otherwise it is missing and synthesis fails) but
+this file shall be used for test synthesis only and not be packaged (otherwise it conflicts with the generated file). See [remove_file_from_ip](#remove_file_from_ip) for
+details about how to remove the file from packaing.
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> files </td>
+      <td> No </td>
+      <td> Files to add (must be residing in the *ttcl* subfolder of the IP) </td>
+    </tr>		
+    <tr>
+      <td> lib </td>
+      <td> Yes </td>
+      <td> VHDL library to compile the files into, default*<ip_name>_<ip_version>* if ths parameter is omitted or "NONE" is passed. </td>
     </tr>
 </table>
 
@@ -792,6 +832,7 @@ Vivado always tries to parse the interfaces automatically from the HDL code. How
 reset polarity is wrong). If Vivado messes up an interface, the automatically parsed interface can be removed by using this command.
 
 **Parameters**  
+
 <table>
     <tr>
       <th width="200"><b>Parameter</b></th>
@@ -802,6 +843,34 @@ reset polarity is wrong). If Vivado messes up an interface, the automatically pa
       <td> name </td>
       <td> No </td>
       <td> Name of the interface to remove </td>
+    </tr>		
+</table>
+
+### remove_file_from_ip
+**Usage**
+
+```
+remove_file_from_ip <path> 
+```
+
+**Description**
+
+Remove a file from the packaged IP (just before packaging). The path must be given relatively to the IP main folder.
+
+This can be used to add files for the test synthesis but not package them into the IP. This is useful when files are
+generated during IP-generation (See [add_ttcl_vhd](#add_ttcl_vhd) )
+
+**Parameters**  
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> path </td>
+      <td> No </td>
+      <td> Path of the file to remove, relative to the IP main directory (e.g. "hdl/some_file.vhd") </td>
     </tr>		
 </table>
 
