@@ -805,6 +805,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	foreach file $RemoveFiles {
 		puts $file
 		ipx::remove_file $file [ipx::get_file_groups xilinx_anylanguagesynthesis -of_objects [ipx::current_core]]
+		ipx::remove_file $file [ipx::get_file_groups xilinx_anylanguagebehavioralsimulation -of_objects [ipx::current_core]]
 	}
 	
 	#Test synthesis if required
