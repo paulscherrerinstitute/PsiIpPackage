@@ -36,6 +36,8 @@ namespace import psi::ip_package::latest::*
  * [gui_parameter_set_enablement](#gui_parameter_set_enablement)
  * [gui_parameter_text_below](#gui_parameter_text_below)
  * [gui_add_parameter](#gui_add_parameter) 
+ * [import_interface_definition](#import_interface_definition) 
+ * [add_bus_interface](#add_bus_interface) 
  * [add_port_enablement_condition](#add_port_enablement_condition) 
  * [add_interface_enablement_condition](#add_interface_enablement_condition)
  * [remove_autodetected_interface](#remove_autodetected_interface) 
@@ -754,6 +756,87 @@ Add the current paramter (the last one created) to the current page of the GUI (
 
 **Parameters**  
 None
+
+### import_interface_definition
+**Usage**
+
+```
+import_interface_definition <srcPath> <defNames> 
+```
+
+**Description**
+
+Copy one or more user-created interface definition(s) to the current target directory.
+They can be used together with [add_bus_interface](#add_bus_interface).
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> srcPath </td>
+      <td> No </td>
+      <td> Path to existing interface definitions</td>
+    </tr>	
+    <tr>
+      <td> defNames </td>
+      <td> No </td>
+      <td> Name of Interface Definition File (can be a list)
+           (e.g. defNames = "Test" imports Test.xml and Test_rtl.xml) </td>
+    </tr>		
+</table>
+
+### add_bus_interface
+**Usage**
+
+```
+add_bus_interface <definition> <name> <mode> <description> <port_maps> 
+```
+
+**Description**
+
+Map ports to an existing bus interface (user-created interfaces must be imported with [import_interface_definition](#import_interface_definition)).
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> definition </td>
+      <td> No </td>
+      <td> Complete VLNV identifier of a existing interface definition
+			(e.g. "xilinx.com:interface:uart:1.0") or just the name (e.g. "uart").
+			If multiple interface definitions with the same name are found,
+			the user gets an error message with a list of all interfaces that were found.</td>
+    </tr>	
+    <tr>
+      <td> name </td>
+      <td> No </td>
+      <td> Name of the bus interface (e.g. "UART") </td>
+    </tr>	
+    <tr>
+      <td> mode </td>
+      <td> No </td>
+      <td> Direction mode of the interface (master, slave, monitor, mirroredMaster, ...) </td>
+    </tr>	
+    <tr>
+      <td> description </td>
+      <td> No </td>
+      <td> Description to the bus interface </td>
+    </tr>	
+    <tr>
+      <td> port_maps </td>
+      <td> No </td>
+      <td> A list with port pairs to map abstraction ports to physical IP ports.
+		   (e.g. {{"Uart_Rx" "RxD"} {"Uart_Tx" "TxD"} {...}} </td>
+    </tr>	
+</table>
 
 ### add_port_enablement_condition
 **Usage**
