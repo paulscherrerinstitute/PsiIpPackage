@@ -1,7 +1,7 @@
 ##############################################################################
-#  Copyright (c) 2019 by Paul Scherrer Institute, Switzerland
+#  Copyright (c) 2020 by Paul Scherrer Institute, Switzerland
 #  All rights reserved.
-#  Authors: Oliver Bruendler
+#  Authors: Oliver Bruendler, Patrick Studer
 ##############################################################################
 
 ####################################################################
@@ -584,6 +584,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	#Having unreferenced files is not allowed (leads to problems in the script). Therefore the warning is promoted to an error.
 	set_msg_config -id  {[IP_Flow 19-3833]} -new_severity "ERROR"
 	ipx::package_project -root_dir $tgtDir -taxonomy /UserIP
+    set OldXguiFile [concat $tgtDir/xgui/[get_property name [ipx::current_core]]_v[string map {. _} [get_property version [ipx::current_core]]].tcl]
 	set_property vendor $IpVendorShort [ipx::current_core]
 	set_property name $IpName [ipx::current_core]
 	set_property library $IpLibrary [ipx::current_core]
@@ -835,6 +836,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	set_property  ip_repo_paths $tgtDir [current_project]
 	update_ip_catalog
 	ipx::check_integrity -quiet [ipx::current_core]
+	
+    #Delete default xgui file (folder)
+    puts "*** Delete Default XGUI File ***"
+    file delete -force $OldXguiFile
 	
 	#close project
 	close_project
