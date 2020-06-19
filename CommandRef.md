@@ -29,7 +29,8 @@ namespace import psi::ip_package::latest::*
  * [add_gui_support_tcl](#add_gui_support_tcl)
  * [gui_create_parameter](#gui_create_parameter) 
  * [gui_create_user_parameter](#gui_create_user_parameter) 
- * [gui_parameter_set_widget_dropdown](#gui_parameter_set_widget_dropdown) 
+ * [gui_parameter_set_widget_dropdown_list](#gui_parameter_set_widget_dropdown_list) 
+ * [gui_parameter_set_widget_dropdown_pairs](#gui_parameter_set_widget_dropdown_pairs) 
  * [gui_parameter_set_widget_checkbox](#gui_parameter_set_widget_checkbox) 
  * [gui_parameter_set_range](#gui_parameter_set_range) 
  * [gui_parameter_set_expression](#gui_parameter_set_expression)
@@ -612,11 +613,11 @@ By default parameters are shown as textboxes.
     </tr>	
 </table>
 
-### gui_parameter_set_widget_dropdown
+### gui_parameter_set_widget_dropdown_list
 **Usage**
 
 ```
-gui_parameter_set_widget_dropdown <values> 
+gui_parameter_set_widget_dropdown_list <values> 
 ```
 
 **Description**
@@ -635,6 +636,32 @@ and [gui_add_parameter](#gui_add_parameter) for a given parameter. It configures
       <td> values </td>
       <td> No </td>
       <td> List of possible values to show in the dropdown menu. </td>
+    </tr>		
+</table>
+
+### gui_parameter_set_widget_dropdown_pairs
+**Usage**
+
+```
+gui_parameter_set_widget_dropdown_pairs <pairs> 
+```
+
+**Description**
+
+This command must be called between [gui_create_parameter](#gui_create_parameter)/[gui_create_user_parameter](#gui_create_user_parameter) 
+and [gui_add_parameter](#gui_add_parameter) for a given parameter. It configures the parameter to be shown in the GUI as dropdown menu.
+
+**Parameters**  
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> pairs </td>
+      <td> No </td>
+      <td> Possible key-value-pairs for the parameter(e.g. {"key1" 1 "key2" 2 ...}). </td>
     </tr>		
 </table>
 
