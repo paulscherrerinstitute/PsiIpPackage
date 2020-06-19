@@ -1,7 +1,7 @@
 ##############################################################################
-#  Copyright (c) 2019 by Paul Scherrer Institute, Switzerland
+#  Copyright (c) 2020 by Paul Scherrer Institute, Switzerland
 #  All rights reserved.
-#  Authors: Oliver Bruendler
+#  Authors: Oliver Bruendler, Patrick Studer
 ##############################################################################
 
 ####################################################################
@@ -33,6 +33,8 @@ variable GuiParameters
 variable CurrentParameter
 variable Logo
 variable DataSheet
+variable ImportInterfaceDefinitions
+variable AddBusInterfaces
 variable PortEnablementConditions
 variable PortInterfaceModes
 variable InterfaceEnablementConditions
@@ -70,6 +72,8 @@ proc init {name version revision library} {
 	variable LibCopied [list]
 	variable GuiPages [list]
 	variable GuiParameters [list]
+	variable ImportInterfaceDefinitions [list]
+	variable AddBusInterfaces [list]
 	variable PortEnablementConditions [list]
 	variable PortInterfaceModes [list]
 	variable InterfaceEnablementConditions [list]
@@ -438,6 +442,47 @@ proc gui_add_parameter {} {
 }
 namespace export gui_add_parameter
 
+
+# Copy one or more user-created interface definition(s) to the current target directory.
+# They can be used together with add_bus_interface.
+#
+# @param srcPath		Path to existing interface definitions
+# @param defNames		Name of Interface Definition File (can be a list)
+#                       (e.g. defNames = "Test" imports Test.xml and Test_rtl.xml)
+proc import_interface_definition {srcPath defNames} {
+    variable ImportInterfaceDefinitions
+    foreach def $defNames {
+        variable BusAbs [concat $srcPath/$def\_rtl.xml]
+        variable BusDef [concat $srcPath/$def.xml]
+        lappend ImportInterfaceDefinitions $BusAbs
+        lappend ImportInterfaceDefinitions $BusDef
+    }
+}
+namespace export import_interface_definition
+
+# Map ports to an existing bus interface (user-created interfaces must be imported with import_interface_definition).
+#
+# @param definition		Complete VLNV identifier of a existing interface definition
+#						(e.g. "xilinx.com:interface:uart:1.0") or just the name (e.g. "uart").
+#						If multiple interface definitions with the same name are found,
+#						the user gets an error message with a list of all interfaces that were found.
+# @param name			Name of the bus interface (e.g. "UART")
+# @param mode			Direction mode of the interface (master, slave, monitor, mirroredMaster, ...)
+# @param description    Description to the bus interface
+# @param port_maps		A list with port pairs to map abstraction ports to physical IP ports.
+#						(e.g. {{"Uart_Rx" "RxD"} {"Uart_Tx" "TxD"} {...}}
+proc add_bus_interface {definition name mode description port_maps} {	
+    variable AddBusInterfaces
+	variable CurrentBusInterface [dict create]
+	dict set CurrentBusInterface DEFI  $definition
+	dict set CurrentBusInterface NAME  $name
+    dict set CurrentBusInterface MODE  $mode
+    dict set CurrentBusInterface DESCRIPTION $description
+    dict set CurrentBusInterface PORT_MAPS $port_maps
+	lappend AddBusInterfaces $CurrentBusInterface
+}
+namespace export add_bus_interface
+
 # Add an enablement condition for a port
 #
 # @param port		Port(s) to add enablement condition for (wildcards etc. allowed). Example : "Adc_*" 
@@ -605,6 +650,11 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			set_property name [psi::util::path::relTo $tgtDir $file false] $obj
 		}
 	}
+
+	#Add Target-Directory to IP-Location
+	puts "*** Add IP Location ***"
+    set_property  ip_repo_paths  $tgtDir [current_project]
+    update_ip_catalog
 	
 	#GUI Initialize (remove auto-generate stuff)
 	ipgui::remove_page -component [ipx::current_core] [ipgui::get_pagespec -name "Page 0" -component [ipx::current_core]]
@@ -698,7 +748,71 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		set_property physical_name $clock [ipx::get_port_maps CLK -of_objects [ipx::get_bus_interfaces $clock -of_objects [ipx::current_core]]]
 	}
 	
-	
+    #Import Interface Definitions
+    puts "*** Import Interface Definitions ***"
+    variable ImportInterfaceDefinitions
+    foreach def $ImportInterfaceDefinitions {
+        update_ip_catalog -add_interface $def -repo_path $tgtDir
+    }
+    
+    update_ip_catalog -rebuild -repo_path $tgtDir
+
+    # Add Bus Interface
+    puts "*** Add Bus Interface ***"
+	variable AddBusInterfaces
+    foreach busIf $AddBusInterfaces {      
+		set IfDefinition    [dict get $busIf DEFI]
+		set IfName          [dict get $busIf NAME]
+		set IfMode          [dict get $busIf MODE]
+		set IfDescription   [dict get $busIf DESCRIPTION]
+		set IfPortMaps      [dict get $busIf PORT_MAPS]
+        set LastDpPosition  [string last ":" $IfDefinition]
+        set LastRtlPosition [string last "_rtl" $IfDefinition]
+        set DefStringLength [string length $IfDefinition]
+        if {$LastDpPosition == -1} {
+            if {[expr {$DefStringLength - $LastRtlPosition - 4}] == 0} {
+                set IfDefinition [string replace $IfDefinition $LastRtlPosition [expr {$DefStringLength - 1}] ""]
+            }
+            set IfBusDef    [ipx::get_ipfiles -type busdef *:$IfDefinition:*]
+            set IfBusAbs    [ipx::get_ipfiles -type busabs *:$IfDefinition\_rtl:*]
+        } else {
+            if {[expr {$LastDpPosition - $LastRtlPosition - 4}] == 0} {
+                set IfDefinition [string replace $IfDefinition $LastRtlPosition [expr {$LastDpPosition - 1}] ""]
+                set LastDpPosition  [expr {$LastDpPosition - 4}]
+            }
+            set IfBusDef    [ipx::get_ipfiles -type busdef $IfDefinition]
+            set IfBusAbs    [ipx::get_ipfiles -type busabs [string replace $IfDefinition $LastDpPosition $LastDpPosition "_rtl:"]]
+        }
+        if {[llength $IfBusDef] == 0} {
+            puts "ERROR: Could not find a interface definition that contains $IfDefinition. Define a valid interface definition or use import_interface_definition if you forgot to import the definition."
+            return
+        } elseif {[llength $IfBusDef] != 1} {
+            error "ERROR: Found multiple interface definitions that contain $IfDefinition (LIST: [get_property vlnv $IfBusDef]). Select a vlnv interface definition from the list and define the name accordingly!"
+            return
+        }
+        set IfBusDefVlnv    [get_property vlnv [lindex $IfBusDef 0]]
+		set IfBusAbsVlnv    [get_property vlnv [lindex $IfBusAbs 0]]
+        set AbsPortList     [get_property name [ipx::get_bus_abstraction_ports -of_objects [lindex $IfBusAbs 0]]]     
+        
+        ipx::add_bus_interface $IfName                      [ipx::current_core]
+        set_property abstraction_type_vlnv $IfBusAbsVlnv    [ipx::get_bus_interfaces $IfName -of_objects [ipx::current_core]]
+        set_property bus_type_vlnv $IfBusDefVlnv            [ipx::get_bus_interfaces $IfName -of_objects [ipx::current_core]]
+        set_property interface_mode $IfMode                 [ipx::get_bus_interfaces $IfName -of_objects [ipx::current_core]]
+        set_property description $IfDescription             [ipx::get_bus_interfaces $IfName -of_objects [ipx::current_core]]
+
+        foreach portMap $IfPortMaps {
+            set PhysicalName [lindex $portMap 0]
+            set AbstractionName [lindex $portMap 1]
+            if {[lsearch -exact $AbsPortList $AbstractionName] == -1} { 
+                error "ERROR: Found no abstraction port that is named $AbstractionName (LIST: $AbsPortList). Select a abstraction port from the list and define the name accordingly!"
+                return
+            }
+            ipx::add_port_map $AbstractionName [ipx::get_bus_interfaces $IfName -of_objects [ipx::current_core]]
+            set_property physical_name $PhysicalName [ipx::get_port_maps $AbstractionName -of_objects [ipx::get_bus_interfaces $IfName -of_objects [ipx::current_core]]]
+        }
+    }
+    
+
 	#Handle optional ports
 	puts "*** Handle optional ports ***"
 	variable PortEnablementConditions
@@ -712,7 +826,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable InterfaceEnablementConditions
 	foreach cond $InterfaceEnablementConditions {
 		set_property enablement_dependency [dict get $cond CONDITION] [ipx::get_bus_interfaces [dict get $cond INTERFACE] -of_objects [ipx::current_core]]
-	}	
+	}
 	
 	#Handle interface modes
 	puts "*** Handle interface modes ***"
@@ -832,10 +946,9 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	ipx::create_xgui_files [ipx::current_core]
 	ipx::update_checksums [ipx::current_core]
 	ipx::save_core [ipx::current_core]
-	set_property  ip_repo_paths $tgtDir [current_project]
-	update_ip_catalog
+					   
 	ipx::check_integrity -quiet [ipx::current_core]
-	
+	update_ip_catalog -rebuild
 	#close project
 	close_project
 	
