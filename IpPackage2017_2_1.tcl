@@ -557,7 +557,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			file copy -force $srcPath $tgtPath
 			add_files -norecurse $tgtPath
 			set_property library [dict get $copied LIBRARY] [get_files $tgtPath]
-			variable fileType [dict get $file TYPE]
+			variable fileType [dict get $copied TYPE]
 			if {$fileType != "NONE"} {
 				set_property file_type $fileType [get_files $tgtPath]
 			}
