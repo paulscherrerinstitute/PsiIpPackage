@@ -43,6 +43,7 @@ variable RemoveAutoIf
 variable DriverDir
 variable DriverFiles
 variable ClockInputs
+variable ResetInputs
 variable IfClocks
 variable TopEntity
 variable DefaultVhdlLib
@@ -89,6 +90,7 @@ proc init {name version revision library} {
 	variable DriverDir "None"
 	variable TopEntity "None"
 	variable ClockInputs [list]
+	variable ResetInputs [list]
 	variable DefaultVhdlLib $IpName\_$IpVersionUnderscore
 	variable GuiSupportTcl [list]
 	variable TtclFiles [list]
@@ -560,6 +562,18 @@ proc add_clock_in_interface {portname} {
 }
 namespace export add_clock_in_interface
 
+# Add a reset input that was not detected by Vivado automatically 
+#
+# @param portname	Name of the reset port to add
+# @param polarity	Polarity of the reset port ("positive" or "negative")
+proc add_reset_in_interface {portname {polarity "positive"}} {
+	variable ResetInputs
+    dict set resets PORTNAME $portname
+	dict set resets POLARITY $polarity
+	lappend ResetInputs $resets
+}
+namespace export add_reset_in_interface
+
 # Package the IP-Core
 #
 # @param tgtDir		Target directory to package the IP into
@@ -794,8 +808,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	}
 
 	#Handle Interfaces not detected automatically
-	puts "*** Handle Interfaces not detected automatically ***"
-	puts "Clocks"
+	puts "*** Add Clock Input Interface ***"
 	variable ClockInputs
 	foreach clock $ClockInputs {
 		ipx::add_bus_interface $clock [ipx::current_core]
@@ -806,6 +819,26 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		ipx::add_port_map CLK [ipx::get_bus_interfaces $clock -of_objects [ipx::current_core]]
 		set_property physical_name $clock [ipx::get_port_maps CLK -of_objects [ipx::get_bus_interfaces $clock -of_objects [ipx::current_core]]]
 	}
+	 
+    puts "*** Add Reset Input Interface ***"
+    variable ResetInputs
+	foreach reset $ResetInputs {
+        set Portname    [dict get $reset PORTNAME]
+		set Polarity    [dict get $reset POLARITY]
+		ipx::add_bus_interface $Portname [ipx::current_core]
+		set_property abstraction_type_vlnv xilinx.com:signal:reset_rtl:1.0 [ipx::get_bus_interfaces $Portname -of_objects [ipx::current_core]]
+		set_property bus_type_vlnv xilinx.com:signal:reset:1.0 [ipx::get_bus_interfaces $Portname -of_objects [ipx::current_core]]
+		set_property display_name $Portname [ipx::get_bus_interfaces $Portname -of_objects [ipx::current_core]]
+		ipx::add_bus_parameter POLARITY [ipx::get_bus_interfaces $Portname -of_objects [ipx::current_core]]
+        if {$Polarity == "positive"} {
+            set_property value ACTIVE_HIGH [ipx::get_bus_parameters POLARITY -of_objects [ipx::get_bus_interfaces $Portname -of_objects [ipx::current_core]]]
+		} elseif {$Polarity == "negative"} {
+            set_property value ACTIVE_LOW [ipx::get_bus_parameters POLARITY -of_objects [ipx::get_bus_interfaces $Portname -of_objects [ipx::current_core]]]
+        }
+        ipx::add_port_map RST [ipx::get_bus_interfaces $Portname -of_objects [ipx::current_core]]
+		set_property physical_name $Portname [ipx::get_port_maps RST -of_objects [ipx::get_bus_interfaces $Portname -of_objects [ipx::current_core]]]
+	}
+    
 	
     #Import Interface Definitions
     puts "*** Import Interface Definitions ***"
