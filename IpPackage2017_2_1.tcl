@@ -1,7 +1,7 @@
 ##############################################################################
-#  Copyright (c) 2019 by Paul Scherrer Institute, Switzerland
+#  Copyright (c) 2020 by Paul Scherrer Institute, Switzerland
 #  All rights reserved.
-#  Authors: Oliver Bruendler
+#  Authors: Oliver Bruendler, Patrick Studer
 ##############################################################################
 
 ####################################################################
@@ -592,10 +592,29 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	set_property vendor_display_name $IpVendor [ipx::current_core]
 	set_property company_url $IpVendorUrl [ipx::current_core]
 	set_property version $IpVersion [ipx::current_core]
-	set_property supported_families {	artix7 Production virtex7 Beta qvirtex7 Beta kintex7 Beta kintex7l Beta qkintex7 Beta qkintex7l \
-										Beta artix7 Beta artix7l Beta aartix7 Beta qartix7 Beta zynq Beta qzynq Beta azynq Beta spartan7 Beta \
-										aspartan7 Beta virtexu Beta virtexuplus Beta kintexuplus Beta zynquplus Beta kintexu Beta} [ipx::current_core]	
-	
+	set_property supported_families { \
+                                        spartan7    Production \
+                                        artix7      Production \
+                                        artix7l     Production \
+                                        kintex7     Production \
+                                        kintex7l    Production \
+                                        kintexu     Production \
+                                        kintexuplus Production \
+                                        virtex7     Production \
+                                        virtexu     Production \
+                                        virtexuplus Production \
+                                        zynq        Production \
+                                        zynquplus   Production \
+                                        aspartan7   Production \
+                                        aartix7     Production \
+                                        azynq       Production \
+                                        qartix7     Production \
+                                        qkintex7    Production \
+                                        qkintex7l   Production \
+                                        qvirtex7    Production \
+                                        qzynq       Production \
+                                    } [ipx::current_core]
+					
     #Make File Group Paths Relative
 	puts "*** Convert all File Group paths to relative paths ***"
 	foreach obj [ipx::get_files -of_objects [ipx::get_file_groups * -of_objects [ipx::current_core]]] {
