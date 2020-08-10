@@ -386,13 +386,24 @@ namespace export gui_create_user_parameter
 # Change the widget of the current parameter to a dropdown list
 #
 # @param values		Possible values for the parameter
-proc gui_parameter_set_widget_dropdown {values} {
+proc gui_parameter_set_widget_dropdown_list {values} {
 	variable CurrentParameter
 	dict set CurrentParameter WIDGET "dropdown"
-	dict set CurrentParameter VALIDATION list
+	dict set CurrentParameter VALIDATION "list"
 	dict set CurrentParameter VALUES $values
 }
-namespace export gui_parameter_set_widget_dropdown
+namespace export gui_parameter_set_widget_dropdown_list
+
+# Change the widget of the current parameter to dropdown pairs
+#
+# @param pairs		Possible key-value-pairs for the parameter(e.g. {"key1" 1 "key2" 2 ...})
+proc gui_parameter_set_widget_dropdown_pairs {pairs} {
+	variable CurrentParameter
+	dict set CurrentParameter WIDGET "dropdown"
+	dict set CurrentParameter VALIDATION "pairs"
+	dict set CurrentParameter VALUES $pairs
+}
+namespace export gui_parameter_set_widget_dropdown_pairs
 
 # Change the widget of the current parameter to a checkbox
 proc gui_parameter_set_widget_checkbox {} {
@@ -729,8 +740,11 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		set ValidationType [dict get $param VALIDATION]
 		set Values [dict get $param VALUES]
 		if {$ValidationType == "list"} {
-			set_property value_validation_type list [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
-			set_property value_validation_list $Values [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+			set_property value_validation_type list     [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+			set_property value_validation_list $Values  [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+		} elseif {$ValidationType == "pairs"} {
+            set_property value_validation_type pairs    [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+            set_property value_validation_pairs $Values [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 		} elseif {$ValidationType == "range"} {
 			set_property value_validation_range_minimum [lindex $Values 0] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 			set_property value_validation_range_maximum [lindex $Values 1] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
