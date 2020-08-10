@@ -24,6 +24,7 @@ variable IpVendor
 variable IpVendorShort
 variable IpVendorUrl
 variable IpDescription
+variable IpTargetLanguage
 variable SrcRelative
 variable LibRelative
 variable LibCopied
@@ -43,6 +44,7 @@ variable DriverDir
 variable DriverFiles
 variable ClockInputs
 variable IfClocks
+variable TopEntity
 variable DefaultVhdlLib
 variable GuiSupportTcl
 variable TtclFiles
@@ -66,8 +68,9 @@ proc init {name version revision library} {
 	variable IpVendor "Paul Scherrer Institute"
 	variable IpVendorUrl "http://www.psi.ch"
 	variable IpVendorShort "psi.ch"
-	variable IpVersionUnderscore
-	regsub -all {\.} $version {_} IpVersionUnderscore; list
+	variable IpVersionUnderscore [string map {. _} $version]
+    variable IpDescription
+    variable IpTargetLanguage "VHDL"
 	variable SrcRelative [list]
 	variable LibRelative [list]
 	variable LibCopied [list]
@@ -100,6 +103,14 @@ proc set_description {desc} {
 	variable IpDescription $desc
 }
 namespace export set_description
+
+# Set the target language of the IP-Core
+#
+# @param lang		Target string (VHDL or Verilog)
+proc set_target_language {lang} {
+	variable IpTargetLanguage $lang
+}
+namespace export set_target_language
 
 # Set the vendor of the IP-Core
 #
@@ -422,8 +433,6 @@ proc gui_parameter_set_range {min max} {
 	dict set CurrentParameter VALUES [list $min $max]
 }
 namespace export gui_parameter_set_range
-	variable CurrentParameter
-	
 
 # Calculate the value of a prameter from an expression (instead of user input)
 #
@@ -644,6 +653,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable IpVendor
 	variable IpVendorShort
 	variable IpVendorUrl
+    variable IpTargetLanguage
 	variable DefaultVhdlLib
 	puts "*** Set IP properties ***"
 	#Having unreferenced files is not allowed (leads to problems in the script). Therefore the warning is promoted to an error.
@@ -713,9 +723,9 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		set VhdlName [dict get $param VHDL_NAME]
 		set DisplayName [dict get $param DISPLAY_NAME]
 		set ParamName [dict get $param PARAM_NAME]
-		puts $ParamName
+		puts -nonewline $ParamName
 		if {$VhdlName == "__NONE__"} {
-			puts "User Param"
+			puts " - User Param"
 			set Type [dict get $param TYPE]
 			set Initial [dict get $param INITIAL]
 			ipx::add_user_parameter $ParamName [ipx::current_core]
@@ -723,7 +733,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 			set_property value_format $Type [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 			set_property value $Initial [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 		} else {
-			puts "Vhdl Param"
+			puts " - Vhdl Param"
 		}
 		ipgui::add_param -name $ParamName -component [ipx::current_core] -parent [ipgui::get_pagespec -name [dict get $param PAGE] -component [ipx::current_core] ] -display_name [dict get $param DISPLAY_NAME]
 
