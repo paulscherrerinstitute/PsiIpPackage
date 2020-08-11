@@ -406,6 +406,11 @@ proc gui_parameter_set_widget_dropdown_list {values} {
 	dict set CurrentParameter VALUES $values
 }
 namespace export gui_parameter_set_widget_dropdown_list
+#Keep old naming for reverse compatibility (don't use for new scripts)
+proc gui_parameter_set_widget_dropdown {values} {
+	gui_parameter_set_widget_dropdown_list $values
+}
+namespace export gui_parameter_set_widget_dropdown
 
 # Change the widget of the current parameter to dropdown pairs
 #
@@ -930,15 +935,18 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	
 	#Set interface clocks
 	puts "*** Set Interface Clocks ***"
+	after 5
 	variable IfClocks
 	foreach ifClock $IfClocks {
 		set intf	[dict get $ifClock INTERFACE]
 		set clk		[dict get $ifClock CLOCK]
         if {$intf == "ALL"} {
             foreach intf_all [get_property name [ipx::get_bus_interfaces -of_objects  [ipx::current_core]]] {
+				puts "ipx::associate_bus_interfaces -busif $intf_all -clock $clk \[ipx::current_core\]"
                 ipx::associate_bus_interfaces -busif $intf_all -clock $clk [ipx::current_core]
             }
         } else {
+			puts "ipx::associate_bus_interfaces -busif $intf -clock $clk \[ipx::current_core\]"
             ipx::associate_bus_interfaces -busif $intf -clock $clk [ipx::current_core]
         }
 	}
