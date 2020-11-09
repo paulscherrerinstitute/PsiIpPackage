@@ -736,14 +736,20 @@ This command allows setting the enablement behavior of a parameter. Disabled par
     <tr>
       <td> expr </td>
       <td> No </td>
-      <td> Expression in curly braces (e.g. *{Channels_g>3}*) </td>
+      <td> Expression in curly braces (e.g. *{Channels_g>3}*) The expression is substituted by `expr` and could need additional braces.</td>
     </tr>	
     <tr>
       <td> default </td>
       <td> No </td>
-      <td> Default state of parameter enablement </td>
+      <td> Default state of parameter enablement (true or false)</td>
     </tr>		
 </table>
+
+**Example**
+```
+ gui_parameter_set_enablement {{ $BUFFER_TYPE == "BUFR" }} true
+```
+
 
 ### gui_parameter_text_below
 **Usage**
