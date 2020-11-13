@@ -676,7 +676,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable DefaultVhdlLib
 	puts "*** Set IP properties ***"
 	#Having unreferenced files is not allowed (leads to problems in the script). Therefore the warning is promoted to an error.
-	set_msg_config -id  {[IP_Flow 19-3833]} -new_severity "ERROR"
+	catch {set_msg_config -id  {[IP_Flow 19-3833]} -new_severity "ERROR"}
 	ipx::package_project -root_dir $tgtDir -taxonomy /UserIP
     set OldXguiFile [concat $tgtDir/xgui/[get_property name [ipx::current_core]]_v[string map {. _} [get_property version [ipx::current_core]]].tcl]
 	set_property vendor $IpVendorShort [ipx::current_core]
