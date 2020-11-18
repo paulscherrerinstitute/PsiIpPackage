@@ -1055,9 +1055,12 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 					   
 	ipx::check_integrity -quiet [ipx::current_core]
 	
-    #Delete default xgui file (folder)
-    puts "*** Delete Default XGUI File ***"
-    file delete -force $OldXguiFile
+    #Delete default xgui file
+	set NewXguiFile [concat $tgtDir/xgui/[get_property name [ipx::current_core]]_v[string map {. _} [get_property version [ipx::current_core]]].tcl]
+    if {$NewXguiFile != $OldXguiFile} {
+		puts "*** Delete Default XGUI File ***"
+		file delete -force $OldXguiFile
+	}
 	
 	update_ip_catalog -rebuild
 	#close project
