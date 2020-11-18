@@ -1,3 +1,16 @@
+## 2.3.0
+* Added Features
+  * GUI supports dropdown lists and pairs 
+  * Added function to import user interface definitions and map IP ports to a bus interface
+  * Added support for multiple interfaces in functions `remove_autodetected_interface` and `set_interface_clock`
+  * Cleaned up device families
+  * Added function to set target language
+  * Added function `add_reset_in_interface` similiar to `add_clock_in_interface`
+  * Added functions `set_interface_mode`, `add_gui_support_tcl` and `gui_parameter_set_expression`
+* Bugfixes
+  * Fixed bug in packaging for `add_lib_copied`
+  * Prevent removed files from being added when it's still in sim sources
+
 ## 2.2.0
 * Added Features
   * VHDL 2008 support by default
