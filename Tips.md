@@ -12,3 +12,15 @@ add_clock_in_interface Clk
 #Set the association manually
 set_interface_clock s00_axi s00_axi_aclk
 ```
+
+## File versioning in Git 
+
+Following generated files should be added to the Git repository:
+
+```
+├── bd
+│   └── bd.tcl
+├── component.xml
+└── xgui
+    └── spi_simple_v1_2.tcl
+```
