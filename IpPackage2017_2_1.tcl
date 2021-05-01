@@ -1,4 +1,4 @@
-    ##############################################################################
+##############################################################################
 #  Copyright (c) 2020 by Paul Scherrer Institute, Switzerland
 #  All rights reserved.
 #  Authors: Oliver Bruendler, Patrick Studer
