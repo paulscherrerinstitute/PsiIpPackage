@@ -74,7 +74,7 @@ in every packaging script.
     <tr>
       <td> name </td>
       <td> No </td>
-      <td> Name of the IP Core. The name cannot contain whitespaces or special characters. </td>
+      <td> Name of the IP Core. The name cannot special characters. </td>
     </tr>
     <tr>
       <td> version </td>

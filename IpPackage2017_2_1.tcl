@@ -1,4 +1,4 @@
-##############################################################################
+    ##############################################################################
 #  Copyright (c) 2020 by Paul Scherrer Institute, Switzerland
 #  All rights reserved.
 #  Authors: Oliver Bruendler, Patrick Studer
@@ -19,6 +19,7 @@ variable IpVersion
 variable IpVersionUnderscore
 variable IpRevision
 variable IpName 
+variable IpDispName 
 variable IpLibrary
 variable IpVendor
 variable IpVendorShort
@@ -53,13 +54,14 @@ variable RemoveFiles
 
 # Initialize IP Packaging process
 #
-# @param name 		Name of the ip core (e.g. bpm_pos)
+# @param name 		Name of the ip core (e.g. "My new IP Core")
 # @param version 	Version of the IP-Core (e.g. 1.0), pass "auto" for using the timestamp
 # @param revision	Revision of the IP-Core (e.g. 12)
 # @param library	Library the IP-Core is compiled into (e.g. GPAC3)
 proc init {name version revision library} {
 	variable IpVersion $version
-	variable IpName $name
+	variable IpDispName $name
+	variable IpName [string map {\  _} $IpDispName]
 	if {$revision=="auto"} {
 		variable IpRevision [clock seconds]
 	} else {
@@ -669,6 +671,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable IpDescription
 	variable IpVersion 
 	variable IpName
+	variable IpDispName
 	variable IpVendor
 	variable IpVendorShort
 	variable IpVendorUrl
@@ -682,7 +685,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	set_property vendor $IpVendorShort [ipx::current_core]
 	set_property name $IpName [ipx::current_core]
 	set_property library $IpLibrary [ipx::current_core]
-	set_property display_name $DefaultVhdlLib [ipx::current_core]
+	set_property display_name $IpDispName [ipx::current_core]
 	set_property description $IpDescription [ipx::current_core]
 	set_property vendor_display_name $IpVendor [ipx::current_core]
 	set_property company_url $IpVendorUrl [ipx::current_core]
@@ -1055,9 +1058,12 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 					   
 	ipx::check_integrity -quiet [ipx::current_core]
 	
-    #Delete default xgui file (folder)
-    puts "*** Delete Default XGUI File ***"
-    file delete -force $OldXguiFile
+    #Delete default xgui file
+	set NewXguiFile [concat $tgtDir/xgui/[get_property name [ipx::current_core]]_v[string map {. _} [get_property version [ipx::current_core]]].tcl]
+    if {$NewXguiFile != $OldXguiFile} {
+		puts "*** Delete Default XGUI File ***"
+		file delete -force $OldXguiFile
+	}
 	
 	update_ip_catalog -rebuild
 	#close project
