@@ -31,6 +31,7 @@ variable LibRelative
 variable LibCopied
 variable GuiPages
 variable CurrentPage
+variable CurrentGroup
 variable GuiParameters 
 variable CurrentParameter
 variable Logo
@@ -78,6 +79,7 @@ proc init {name version revision library} {
 	variable LibRelative [list]
 	variable LibCopied [list]
 	variable GuiPages [list]
+	variable CurrentGroup "None"
 	variable GuiParameters [list]
 	variable ImportInterfaceDefinitions [list]
 	variable AddBusInterfaces [list]
@@ -303,10 +305,27 @@ namespace export add_gui_support_tcl
 # @param name		Name of the new GUI page
 proc gui_add_page {name} {
 	variable CurrentPage $name
+	variable CurrentGroup "None"
 	variable GuiPages
 	lappend GuiPages $name
 }
 namespace export gui_add_page
+
+# Add parameter group to the GUI page
+# 
+# @param name       Name of the new parameter group
+proc gui_add_group {name} {
+    variable CurrentPage
+	variable CurrentGroup $name
+}
+namespace export gui_add_group
+
+# Exit the current parameter group (next parameter is outside of the group) 
+proc gui_exit_group {} {
+	variable CurrentGroup "None"
+}
+namespace export gui_exit_group
+
 
 # Remove an interface that is detected by vivado automatically
 #
@@ -354,11 +373,13 @@ namespace export set_interface_clock
 # @param displayName	Name of the parameter to be displayed in the GUI
 proc gui_create_parameter {vhdlName displayName} {
 	variable CurrentPage	
+	variable CurrentGroup
 	variable CurrentParameter [dict create]
 	dict set CurrentParameter PARAM_NAME $vhdlName
 	dict set CurrentParameter VHDL_NAME $vhdlName
 	dict set CurrentParameter DISPLAY_NAME $displayName
 	dict set CurrentParameter PAGE  $CurrentPage
+	dict set CurrentParameter GROUP $CurrentGroup
 	dict set CurrentParameter VALIDATION  "None"
 	dict set CurrentParameter VALUES {}
 	dict set CurrentParameter WIDGET "text"	
@@ -377,6 +398,7 @@ namespace export gui_create_parameter
 # @param initialValue	Initial Value of the parameter
 proc gui_create_user_parameter {paramName type initialValue {displayName "None"}} {
 	variable CurrentPage	
+	variable CurrentGroup
 	variable CurrentParameter [dict create]
 	dict set CurrentParameter VHDL_NAME "__NONE__"
 	if {$displayName == "None"} {
@@ -386,6 +408,7 @@ proc gui_create_user_parameter {paramName type initialValue {displayName "None"}
 	}
 	dict set CurrentParameter PARAM_NAME $paramName
 	dict set CurrentParameter PAGE  $CurrentPage
+	dict set CurrentParameter GROUP $CurrentGroup
 	dict set CurrentParameter VALIDATION  "None"
 	dict set CurrentParameter VALUES {}
 	dict set CurrentParameter WIDGET "text"	
@@ -741,12 +764,22 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	#Handle Parameters
 	variable GuiParameters
 	puts "*** Define GUI parameters ***"
+	set PrevGroup "None"
 	foreach param $GuiParameters {
 		#Add parameters
 		set VhdlName [dict get $param VHDL_NAME]
 		set DisplayName [dict get $param DISPLAY_NAME]
 		set ParamName [dict get $param PARAM_NAME]
+		set GroupName [dict get $param GROUP]
 		puts -nonewline $ParamName
+		
+		#Add Page if required
+		if {($GroupName != $PrevGroup) && ($GroupName != "None")} {
+			ipgui::add_group -name "$GroupName" -component [ipx::current_core] -parent [ipgui::get_pagespec -name "[dict get $param PAGE]" -component [ipx::current_core] ] -display_name "$GroupName"
+		}	
+		set PrevGroup $GroupName
+		
+		#Create parameter
 		if {$VhdlName == "__NONE__"} {
 			puts " - User Param"
 			set Type [dict get $param TYPE]
@@ -758,7 +791,14 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		} else {
 			puts " - Vhdl Param"
 		}
-		ipgui::add_param -name $ParamName -component [ipx::current_core] -parent [ipgui::get_pagespec -name [dict get $param PAGE] -component [ipx::current_core] ] -display_name [dict get $param DISPLAY_NAME]
+		
+		#Find parent
+		if {[dict get $param GROUP] == "None"} {
+			set Parent [ipgui::get_pagespec -name "[dict get $param PAGE]" -component [ipx::current_core]]
+		} else {
+			set Parent [ipgui::get_groupspec -name "[dict get $param GROUP]" -component [ipx::current_core]]
+		}			
+		ipgui::add_param -name $ParamName -component [ipx::current_core] -parent $Parent -display_name [dict get $param DISPLAY_NAME]
 
 		#Widget Configuration
 		set Widget [dict get $param WIDGET]

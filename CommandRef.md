@@ -26,6 +26,8 @@ namespace import psi::ip_package::latest::*
  * [add_lib_copied](#add_lib_copied) 
  * [add_ttcl_vhd](#add_ttcl_vhd)
  * [gui_add_page](#gui_add_page) 
+ * [gui_add_group](#gui_add_group)
+ * [gui_exit_group](#gui_exit_group)
  * [add_gui_support_tcl](#add_gui_support_tcl)
  * [gui_create_parameter](#gui_create_parameter) 
  * [gui_create_user_parameter](#gui_create_user_parameter) 
@@ -534,6 +536,48 @@ Add a page to the IP-Configuration GUI that can be displayed in Vivado.
       <td> Name resp. title of the GUI page to add </td>
     </tr>		
 </table>
+
+### gui_add_group
+**Usage**
+
+```
+gui_add_group <name> 
+```
+
+**Description**  
+Add a group with a title to a page.
+
+**Parameters**
+
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> name </td>
+      <td> No </td>
+      <td> Name resp. title of the parameter group to add </td>
+    </tr>		
+</table>
+
+### gui_exit_group
+**Usage**
+
+```
+gui_add_group <name> 
+#... Add parameters that belong to the group
+gui_exit_group
+#... Add parameters after the group
+```
+
+**Description**  
+Leave a group previously created by *gui_add_group*.
+
+**Parameters**
+
+*None*
 
 ### gui_create_parameter
 **Usage**
