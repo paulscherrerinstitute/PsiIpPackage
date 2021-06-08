@@ -55,7 +55,7 @@ variable RemoveFiles
 
 # Initialize IP Packaging process
 #
-# @param name 		Name of the ip core (e.g. "My new IP Core")
+# @param name 		Name of the IP-Core (e.g. "My new IP Core")
 # @param version 	Version of the IP-Core (e.g. 1.0), pass "auto" for using the timestamp
 # @param revision	Revision of the IP-Core (e.g. 12)
 # @param library	Library the IP-Core is compiled into (e.g. GPAC3)
@@ -200,7 +200,7 @@ namespace export add_sources_relative
 # is that they could potentially change in future Vivado versions. This way the update can be implemented 
 # automatically.
 #
-# The driver sources must be located in the folder *DRIVER_MAIN/src* due to Limitations of Vivado. A folder 
+# The driver sources must be located in the folder *DRIVER_MAIN/src* due to limitations of Vivado. A folder 
 # *DRIVER_MAIN/data* must also exist, also because Vivado expects this folder.
 #
 # @param dir	Driver directory (should be named according to the IP-Core)
@@ -214,9 +214,9 @@ namespace export add_drivers_relative
 
 # Add library files that are referenced to relatively
 #
-# @param libPath	Relative path to the common library director of all files 
+# @param libPath	Relative path to the common library directory of all files 
 # @param files		List containing the file paths within the library
-# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
+# @param lib		VHDL library to compile files into (optional, default is <ip_name>_<ip_version>)
 #					"NONE" can be used to compile the files into the default library.
 # @param type		Override file type detected by vivado automatically. For VHDL, VHDL 2008 is used by default.
 proc add_lib_relative {libPath files {lib "NONE"} {type "NONE"}} {
@@ -245,7 +245,7 @@ namespace export add_lib_relative
 # @param tgtPath	Relative path to the directory in the IP-Core the files shall be copied into
 # @param libPath	Relative path to the common library director of all files 
 # @param files		List containing the file paths within the library directory
-# @param lib		VHDL library to copile files into (optional, default is <ip_name>_<ip_version>)
+# @param lib		VHDL library to compile files into (optional, default is <ip_name>_<ip_version>)
 #					"NONE" can be used to compile the files into the default library.
 # @param type		Override file type detected by vivado automatically. For VHDL, VHDL 2008 is used by default.
 proc add_lib_copied {tgtPath libPath files {lib "NONE"} {type "NONE"}} {
@@ -608,7 +608,7 @@ namespace export add_reset_in_interface
 #
 # @param tgtDir		Target directory to package the IP into
 # @param edit 		[Optional] pass True to leave the IP packager GUI open for checking results etc.
-# @param synth		[Optional] pass True to run a test syncthesis to verify vivado can synthesize the core
+# @param synth		[Optional] pass True to run a test synthesis to verify vivado can synthesize the core
 # @param part 		[Optional] Xilinx part number to do the test synthesis for (artix 7 by vivado default)
 proc package {tgtDir {edit false} {synth false} {part ""}} {
 	#create project, use default part defined by vivado when not specified:
