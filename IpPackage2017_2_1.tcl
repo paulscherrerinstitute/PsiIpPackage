@@ -44,6 +44,7 @@ variable InterfaceEnablementConditions
 variable RemoveAutoIf
 variable DriverDir
 variable DriverFiles
+variable XparParameters
 variable ClockInputs
 variable ResetInputs
 variable IfClocks
@@ -92,6 +93,7 @@ proc init {name version revision library} {
 	variable DataSheet "None"
 	variable DriverFiles [list]
 	variable DriverDir "None"
+	variable XparParameters [list]
 	variable TopEntity "None"
 	variable ClockInputs [list]
 	variable ResetInputs [list]
@@ -211,6 +213,16 @@ proc add_drivers_relative {dir files} {
 	variable DriverFiles [concat $DriverFiles $files]
 }
 namespace export add_drivers_relative
+
+# Add IP parameter value to xparameters.h
+#
+# @parameter 	Name of the parameter to add (vhdlName of gui_create_parameter or paramName of gui_create_user_parameter)
+proc add_xparameters_entry {parameter} {
+	variable XparParameters
+	lappend XparParameters $parameter
+}
+namespace export add_xparameters_entry
+
 
 # Add library files that are referenced to relatively
 #
@@ -1019,6 +1031,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable DriverDir
 	variable DriverFiles
 	variable fileLoc
+	variable XparParameters
 	puts "*** Add drivers ***"
 	if {$DriverDir != "None"} {
 		#Initialize Driver
@@ -1035,7 +1048,12 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		set_property type mdd [ipx::get_files $MddPathRel -of_objects [ipx::get_file_groups xilinx_softwaredriver -of_objects [ipx::current_core]]]
 		
 		#.TCL File
-		psi::util::string::copyAndReplaceTags "$fileLoc/Snippets/driver/snippet.tcl" $DriverDir/data/$IpName\.tcl [dict create <IP_NAME> $IpName]
+		set paramList ""
+		foreach param $XparParameters {
+			set paramList "$paramList \"$param\""
+		}
+		set paramList [string trim $paramList]
+		psi::util::string::copyAndReplaceTags "$fileLoc/Snippets/driver/snippet.tcl" $DriverDir/data/$IpName\.tcl [dict create <IP_NAME> $IpName <PARAM_LIST> $paramList]
 		set TclPathRel [psi::util::path::relTo $tgtDir $DriverDir/data/$IpName\.tcl false]
 		ipx::add_file $TclPathRel [ipx::get_file_groups xilinx_softwaredriver -of_objects [ipx::current_core]]
 		set_property type tclSource [ipx::get_files $TclPathRel -of_objects [ipx::get_file_groups xilinx_softwaredriver -of_objects [ipx::current_core]]]
