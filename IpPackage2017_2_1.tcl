@@ -1024,6 +1024,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		#Initialize Driver
 		ipx::add_file_group -type software_driver {} [ipx::current_core]		
 		
+		#Create directoreis if required
+		file mkdir $DriverDir/data
+		file mkdir $DriverDir/src
+		
 		#.MDD File
 		psi::util::string::copyAndReplaceTags "$fileLoc/Snippets/driver/snippet.mdd" $DriverDir/data/$IpName\.mdd [dict create <IP_NAME> $IpName]
 		set MddPathRel [psi::util::path::relTo $tgtDir $DriverDir/data/$IpName\.mdd false]
