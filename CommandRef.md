@@ -1123,8 +1123,35 @@ The driver sources must be located in the folder *DRIVER_MAIN/src* due to Limita
       <td> List of driver source files (relative to *dir*) </td>
     </tr>
 </table>
+### add_xparameters_entry
+
+**Usage**
+
+```
+add_xparameters_entry <parameter>
+```
+
+**Description**
+
+This command adds an entry to the *xparameters.h* file representing the value of an IP parameter. This often is useful to transfer information from the BD into Vitis/Sdk. 
+
+**Parameters**  
+
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> parameter </td>
+      <td> No </td>
+      <td> Name of the parameter to add (vhdlName of gui_create_parameter or paramName of gui_create_user_parameter)</td>
+    </tr>
+</table>
 
 ### set_interface_mode
+
 **Usage**
 
 ```
@@ -1197,4 +1224,3 @@ Additionally a test-synthesis can be ran to check if all files required are adde
       <td> Xilinx part number to use for the test-synthesis. By default Vivado chooses an available part. </td>
     </tr> 
 </table>
-
