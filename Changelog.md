@@ -1,3 +1,9 @@
+## 2.4.0
+* Added Features
+  * Automatically create driver directories
+  * Generated Makefile Vivado compatible
+  * Added Option to add parameter values to xparameters.h
+
 ## 2.3.0
 * Added Features
   * GUI supports dropdown lists and pairs 
