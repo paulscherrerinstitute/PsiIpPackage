@@ -24,6 +24,7 @@ namespace import psi::ip_package::latest::*
  * [add_sources_relative](#add_sources_relative) 
  * [add_lib_relative](#add_lib_relative) 
  * [add_lib_copied](#add_lib_copied) 
+ * [add_sub_core_reference](#add_sub_core_reference)
  * [add_ttcl_vhd](#add_ttcl_vhd)
  * [gui_add_page](#gui_add_page) 
  * [gui_add_group](#gui_add_group)
@@ -416,6 +417,39 @@ By default the file type is determined by Vivado automatically but the auto dete
       <td> type </td>
       <td> Yes </td>
       <td> Vivado file type. By default, the file type is detected automatically. Automatic detection can also be achieved by passing "NONE". </td>
+    </tr>
+</table>
+
+### add_sub_core_reference
+**Usage**
+
+```
+add_sub_core_reference {<Subcore VLNV>}
+```
+
+**Example**
+
+```
+add_sub_core_reference {
+        xilinx.com:ip:axis_switch:1.1 \
+}
+```
+
+**Description**
+
+Add one or more sub core references to the IP-Core. Use the VLNV nameing to identify the cores. Note: Not all IP from the repositories can be selected. Check with the IP-Packager which IP are supported.
+
+**Parameters**
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> cores </td>
+      <td> No </td>
+      <td> List of VLNV to add to the IP-Core </td>
     </tr>
 </table>
 
