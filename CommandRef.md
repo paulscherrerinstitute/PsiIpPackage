@@ -88,8 +88,9 @@ in every packaging script.
       <td> No </td>
       <td> Revision of the IP-core. Alternative to passing a number, the string "auto" can be passed. In this
            case the UNIX timestamp of the build time is taken as revision which results in an automatically
-           updated and unique revision number. As a result, Vivado detects a new revision every time time
-		   IP core is packaged. </td>
+           updated and unique revision number. As a result, Vivado detects a new revision every time the
+		   IP core is packaged. With the string "hash" the revision number is generated as a hash from the
+		   source. This allows to rerun the script without any change of the revision number unless the script was modified.</td>
     </tr>		
 </table>
 

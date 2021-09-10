@@ -9,6 +9,7 @@
 ####################################################################
 
 #Dependencies
+package require md5
 variable fileLoc [file normalize [file dirname [info script]]]
 source $fileLoc/PsiUtilPath.tcl
 source $fileLoc/PsiUtilString.tcl
@@ -57,8 +58,9 @@ variable RemoveFiles
 # Initialize IP Packaging process
 #
 # @param name 		Name of the IP-Core (e.g. "My new IP Core")
-# @param version 	Version of the IP-Core (e.g. 1.0), pass "auto" for using the timestamp
+# @param version 	Version of the IP-Core (e.g. 1.0)
 # @param revision	Revision of the IP-Core (e.g. 12)
+#                   Pass "auto" for using the timestamp or "hash" for using a hash of the source script.
 # @param library	Library the IP-Core is compiled into (e.g. GPAC3)
 proc init {name version revision library} {
 	variable IpVersion $version
@@ -66,6 +68,9 @@ proc init {name version revision library} {
 	variable IpName [string map {\  _} $IpDispName]
 	if {$revision=="auto"} {
 		variable IpRevision [clock seconds]
+	} elseif {$revision=="hash"} {
+	    variable IpRevision [string range [expr 0x[md5::md5 -hex -file "$::argv0"]] 0 5]
+	    puts $IpRevision
 	} else {
 		variable IpRevision $revision
 	}	
