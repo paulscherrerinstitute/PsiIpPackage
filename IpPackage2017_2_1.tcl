@@ -54,6 +54,7 @@ variable DefaultVhdlLib
 variable GuiSupportTcl
 variable TtclFiles
 variable RemoveFiles
+variable SubCores
 
 # Initialize IP Packaging process
 #
@@ -103,6 +104,7 @@ proc init {name version revision library} {
 	variable GuiSupportTcl [list]
 	variable TtclFiles [list]
 	variable RemoveFiles [list]
+    variable SubCores [list]
 }
 namespace export init
 
@@ -204,6 +206,15 @@ proc add_sources_relative {srcs {lib "NONE"} {type "NONE"}} {
 	}
 }
 namespace export add_sources_relative
+
+# Add sub core reference
+#
+# @param cores       List containing the sub cores to be added to the project.
+proc add_sub_core_reference {cores} {
+	variable SubCores
+	lappend SubCores $cores
+}
+namespace export add_sub_core_reference
 
 # Add SW driver files that are referenced to relatively
 #
@@ -773,6 +784,16 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	puts "*** Add IP Location ***"
     set_property  ip_repo_paths  $tgtDir [current_project]
     update_ip_catalog
+
+    # Add references to sub-cores
+    puts "*** Add references to sub-cores***"
+    variable SubCores
+    foreach core $SubCores {
+        puts [string trim $core]
+        ipx::add_subcore [string trim $core] [ipx::get_file_groups xilinx_anylanguagesynthesis -of_objects [ipx::current_core]]
+        ipx::add_subcore [string trim $core] [ipx::get_file_groups xilinx_anylanguagebehavioralsimulation -of_objects [ipx::current_core]]
+    }
+    ipx::merge_project_changes files [ipx::current_core]
 	
 	#GUI Initialize (remove auto-generate stuff)
 	ipgui::remove_page -component [ipx::current_core] [ipgui::get_pagespec -name "Page 0" -component [ipx::current_core]]
@@ -783,7 +804,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	foreach page $GuiPages {
 		ipgui::add_page -name "$page" -component [ipx::current_core] -display_name "$page"
 	}
-	
+
 	#Handle Parameters
 	variable GuiParameters
 	puts "*** Define GUI parameters ***"
