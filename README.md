@@ -6,6 +6,7 @@ Jonas Purtschert [jonas.purtschert@psi.ch]
 ## Authors
 * Oliver Bründler [oli.bruendler@gmx.ch]
 * Jonas Purtschert [jonas.purtschert@psi.ch]
+* Reto Meier [reto.meier@dectris.com]
 
 ## License
 This library is published under [PSI HDL Library License](License.txt), which is [LGPL](LGPL2_1.txt) plus some additional exceptions to clarify the LGPL terms in the context of firmware development.
@@ -59,7 +60,7 @@ init $IP_NAME $IP_VERSION $IP_REVISION $IP_LIBRARY
 set_description $IP_DESCIRPTION
 set_logo_relative "../doc/psi_logo_150.gif"
 set_datasheet_relative "../doc/$IP_NAME.pdf"
-set_taxonomy {/AXI_Infrastructure /Communication_&_Networking/Ethernet}
+set_taxonomy {"/UserIP" "/DSP/Recorder"}
 
 ###############################################################
 # Add Source Files
