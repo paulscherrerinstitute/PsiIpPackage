@@ -1190,6 +1190,7 @@ The driver sources must be located in the folder *DRIVER_MAIN/src* due to Limita
       <td> List of driver source files (relative to *dir*) </td>
     </tr>
 </table>
+
 ### add_xparameters_entry
 
 **Usage**
