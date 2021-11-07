@@ -20,6 +20,7 @@ namespace import psi::ip_package::latest::*
  * [set_vendor_url](#set_vendor_url)
  * [set_logo_relative](#set_logo_relative) 
  * [set_datasheet_relative](#set_datasheet_relative)
+ * [set_taxonomy](#set_taxonomy)
  * [set_top_entity](#set_top_entity)
  * [add_sources_relative](#add_sources_relative) 
  * [add_lib_relative](#add_lib_relative) 
@@ -252,6 +253,38 @@ Add a Datasheet to the IP-Core. The datasheet is not copied into the IP-Core but
       <td> datasheet </td>
       <td> No </td>
       <td> Path to the datasheet. </td>
+    </tr>
+</table>
+
+### set_taxonomy
+**Usage**
+
+```
+set_taxonomy <groups>
+```
+
+**Example**
+
+```
+set_taxonomy {/AXI_Infrastructure /Communication_&_Networking/Ethernet /my_new_group}
+```
+
+**Description**
+
+A custom taxonomy (display grouping in the IP Catalog) can be added by this command. Each IP can be represented in one or multiple groups. The command expects a list of groups as parameter. Groups can be split into sub-groups by using a "file" like structure */main_group/sub_group*. Unknown groups are automatically created by Vivado.
+
+**Parameters**
+
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> taxonomy </td>
+      <td> No </td>
+      <td> List of taxonomy groups. </td>
     </tr>
 </table>
 

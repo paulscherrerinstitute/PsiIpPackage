@@ -26,6 +26,7 @@ variable IpVendorShort
 variable IpVendorUrl
 variable IpDescription
 variable IpTargetLanguage
+variable IpTaxonomy
 variable SrcRelative
 variable LibRelative
 variable LibCopied
@@ -76,6 +77,7 @@ proc init {name version revision library} {
 	variable IpVersionUnderscore [string map {. _} $version]
     variable IpDescription
     variable IpTargetLanguage "VHDL"
+	variable IpTaxonomy {{"/UserIP "}}
 	variable SrcRelative [list]
 	variable LibRelative [list]
 	variable LibCopied [list]
@@ -143,6 +145,14 @@ proc set_vendor_url {url} {
 	variable IpVendorUrl $url
 }
 namespace export set_vendor_url
+
+# Set the taxonomy of the IP-Core
+#
+# @param taxonomy   List of categories
+proc set_taxonomy {taxonomy} {
+	variable IpTaxonomy $taxonomy
+}
+namespace export set_taxonomy
 
 # Set the name of the top-entity (only required if Vivado cannot determine the top entity automatically)
 #
@@ -710,12 +720,13 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	variable IpVendor
 	variable IpVendorShort
 	variable IpVendorUrl
+	variable IpTaxonomy
     variable IpTargetLanguage
 	variable DefaultVhdlLib
 	puts "*** Set IP properties ***"
 	#Having unreferenced files is not allowed (leads to problems in the script). Therefore the warning is promoted to an error.
 	catch {set_msg_config -id  {[IP_Flow 19-3833]} -new_severity "ERROR"}
-	ipx::package_project -root_dir $tgtDir -taxonomy /UserIP
+	ipx::package_project -root_dir $tgtDir -taxonomy $IpTaxonomy
     set OldXguiFile [concat $tgtDir/xgui/[get_property name [ipx::current_core]]_v[string map {. _} [get_property version [ipx::current_core]]].tcl]
 	set_property vendor $IpVendorShort [ipx::current_core]
 	set_property name $IpName [ipx::current_core]
@@ -765,7 +776,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	
 	#GUI Initialize (remove auto-generate stuff)
 	ipgui::remove_page -component [ipx::current_core] [ipgui::get_pagespec -name "Page 0" -component [ipx::current_core]]
-	
+
 	#Add Pages
 	puts "*** Add GUI pages ***"
 	variable GuiPages

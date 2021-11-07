@@ -53,12 +53,13 @@ set IP_NAME data_rec
 set IP_VERSION 1.0
 set IP_REVISION "auto"
 set IP_LIBRARY GPAC3
-set IP_DESCIRPTION "Mutli channel data recorder (supports pre-trigger and self-triggering)"
+set IP_DESCIRPTION "Multi channel data recorder (supports pre-trigger and self-triggering)"
 
 init $IP_NAME $IP_VERSION $IP_REVISION $IP_LIBRARY
 set_description $IP_DESCIRPTION
 set_logo_relative "../doc/psi_logo_150.gif"
 set_datasheet_relative "../doc/$IP_NAME.pdf"
+set_taxonomy {/AXI_Infrastructure /Communication_&_Networking/Ethernet}
 
 ###############################################################
 # Add Source Files
