@@ -37,6 +37,7 @@ namespace import psi::ip_package::latest::*
  * [gui_parameter_set_widget_dropdown_pairs](#gui_parameter_set_widget_dropdown_pairs) 
  * [gui_parameter_set_widget_checkbox](#gui_parameter_set_widget_checkbox) 
  * [gui_parameter_set_range](#gui_parameter_set_range) 
+ * [gui_parameter_disable_range_validation](#gui_parameter_disable_range_validation)
  * [gui_parameter_set_expression](#gui_parameter_set_expression)
  * [gui_parameter_set_enablement](#gui_parameter_set_enablement)
  * [gui_parameter_text_below](#gui_parameter_text_below)
@@ -825,6 +826,17 @@ and [gui_add_parameter](#gui_add_parameter) for a given parameter. It configures
       <td> Upper bound of the valid range </td>
     </tr>		
 </table>
+
+### gui_parameter_disable_range_validation
+**Usage**
+
+```
+gui_parameter_disable_range_validation
+```
+
+**Description**
+
+This command allows disabling the range validation.
 
 ### gui_parameter_set_enablement
 **Usage**

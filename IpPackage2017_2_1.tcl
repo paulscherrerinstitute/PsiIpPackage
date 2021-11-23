@@ -499,6 +499,13 @@ proc gui_parameter_set_range {min max} {
 }
 namespace export gui_parameter_set_range
 
+# Disable the input validation entered using a text-field
+proc gui_parameter_disable_range_validation {} {
+	variable CurrentParameter
+	dict set CurrentParameter VALIDATION disable
+}
+namespace export gui_parameter_disable_range_validation
+
 # Calculate the value of a prameter from an expression (instead of user input)
 #
 # @param expression		Expression to use (e.g. {$Channels_g > 2"})
@@ -853,6 +860,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		} elseif {$Widget == "checkbox"} {
 			set_property widget {checkBox} [ipgui::get_guiparamspec -name $ParamName -component [ipx::current_core]]
 		}
+
 		#Validation type
 		set ValidationType [dict get $param VALIDATION]
 		set Values [dict get $param VALUES]
@@ -865,7 +873,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		} elseif {$ValidationType == "range"} {
 			set_property value_validation_range_minimum [lindex $Values 0] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 			set_property value_validation_range_maximum [lindex $Values 1] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+		} elseif {$ValidationType == "disable"} {
+			set_property value_validation_type none [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 		}
+
 		#Enablement dependency
 		set EnablementDep [dict get $param ENABLEMENTDEP]
 		set EnablementDef [dict get $param ENABLEMENTDEF]
