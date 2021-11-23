@@ -414,6 +414,7 @@ proc gui_create_parameter {vhdlName displayName} {
 	dict set CurrentParameter PAGE  $CurrentPage
 	dict set CurrentParameter GROUP $CurrentGroup
 	dict set CurrentParameter VALIDATION  "None"
+	dict set CurrentParameter SHOW_RANGE_HINT true
 	dict set CurrentParameter VALUES {}
 	dict set CurrentParameter WIDGET "text"	
 	dict set CurrentParameter EXPRESSION "None"
@@ -443,6 +444,7 @@ proc gui_create_user_parameter {paramName type initialValue {displayName "None"}
 	dict set CurrentParameter PAGE  $CurrentPage
 	dict set CurrentParameter GROUP $CurrentGroup
 	dict set CurrentParameter VALIDATION  "None"
+	dict set CurrentParameter SHOW_RANGE_HINT true
 	dict set CurrentParameter VALUES {}
 	dict set CurrentParameter WIDGET "text"	
 	dict set CurrentParameter TYPE $type
@@ -505,6 +507,12 @@ proc gui_parameter_disable_range_validation {} {
 	dict set CurrentParameter VALIDATION disable
 }
 namespace export gui_parameter_disable_range_validation
+
+proc gui_parameter_show_range_hint {show} {
+	variable CurrentParameter
+	dict set CurrentParameter SHOW_RANGE_HINT $show
+}
+namespace export gui_parameter_show_range_hint
 
 # Calculate the value of a prameter from an expression (instead of user input)
 #
@@ -876,6 +884,10 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		} elseif {$ValidationType == "disable"} {
 			set_property value_validation_type none [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 		}
+
+		#Show range hint
+		set ShowRangeHint [dict get $param SHOW_RANGE_HINT]
+		set_property show_range {$ShowRangeHint} [ipgui::get_guiparamspec -name $ParamName -component [ipx::current_core]]
 
 		#Enablement dependency
 		set EnablementDep [dict get $param ENABLEMENTDEP]
