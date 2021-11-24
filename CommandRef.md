@@ -12,7 +12,7 @@ namespace import psi::ip_package::latest::*
 
 # Command Links
 * General Commands
- * [init](#init)  
+ * [init](#init)
 * Configuration Commands
  * [set_description](#set_description) 
  * [set_vendor](#set_vendor) 
@@ -21,6 +21,8 @@ namespace import psi::ip_package::latest::*
  * [set_logo_relative](#set_logo_relative) 
  * [set_datasheet_relative](#set_datasheet_relative)
  * [set_taxonomy](#set_taxonomy)
+ * [set_supported_families](#set_supported_families)
+ * [set_automatic_family_support](#set_automatic_family_support)
  * [set_top_entity](#set_top_entity)
  * [add_sources_relative](#add_sources_relative) 
  * [add_lib_relative](#add_lib_relative) 
@@ -286,6 +288,92 @@ A custom taxonomy (display grouping in the IP Catalog) can be added by this comm
       <td> taxonomy </td>
       <td> No </td>
       <td> List of taxonomy groups. </td>
+    </tr>
+</table>
+
+### set_supported_families
+**Usage**
+
+```
+set_supported_families <families>
+```
+
+**Example**
+
+```
+set_supported_families { \
+    zynq        Production \
+    zynquplus   Production \
+    aspartan7   Beta \
+    aartix7     Beta \
+}
+```
+
+**Description**
+Set the list of supported (or unsupported) FPGA families and the life cycle of the IP for the corresponding family. Each family is represented as a tupple of "family name" and "life cycle".
+
+Valid life cycle states are:
+* Beta
+* Discontinued
+* Hidden
+* Pre-Production
+* Production
+* Removed
+* Superseded
+
+Setting the property to Discontinued, Hidden, Removed, or Superseded ensures that the IP does not appear in the IP catalog for the associated device family or part.
+
+If the command `automatic_family_support` is used, this list may be use to hide the IP from some families. If `set_supported_families` is not defined and also `automatic_family_support` is not set, a default list will be used to keep backwards compatibility.
+
+**Parameters**
+
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> families </td>
+      <td> No </td>
+      <td> List of families and their life cycle </td>
+    </tr>
+</table>
+
+### set_automatic_family_support
+**Usage**
+
+```
+set_automatic_family_support <level>
+```
+
+**Example**
+
+```
+set_automatic_family_support level_2
+```
+
+**Description**
+Automatic Family Support is a way for your custom IP to define the IP’s life cycle and supported families, without having to explicitly specify each family or specific parts. You may choose one of the following life cycle levels for your IP:
+* `level_1`: The IP life cycle is Pre-Production for all families.
+* `level_2`: The IP life cycle is based on the part `SPEED_LABEL` property. If the `SPEED_LABEL` property is Production, then the supported life-cycle is Production. Otherwise, the supported life-cycle is Pre-Production.
+* `Level_beta`: The IP life cycle is Beta for all families.
+* `level_discontinued`: The IP life cycle is Discontinued for all families.
+
+Setting the `automatic_family_support` removes the predefined list of supported devices.
+
+**Parameters**
+
+<table>
+    <tr>
+      <th width="200"><b>Parameter</b></th>
+      <th align="center" width="80"><b>Optional</b></th>
+      <th align="right"><b>Description</b></th>
+    </tr>
+    <tr>
+      <td> level </td>
+      <td> No </td>
+      <td> Life cycle level (see description) </td>
     </tr>
 </table>
 

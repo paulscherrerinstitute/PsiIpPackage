@@ -15,6 +15,9 @@ source $fileLoc/PsiUtilString.tcl
 namespace export -clear
 
 #Internal Variables
+variable AutomaticFamilySupport
+variable FamilySupport
+variable FamilySupportChanged
 variable IpVersion 
 variable IpVersionUnderscore
 variable IpRevision
@@ -63,6 +66,30 @@ variable SubCores
 # @param revision	Revision of the IP-Core (e.g. 12)
 # @param library	Library the IP-Core is compiled into (e.g. GPAC3)
 proc init {name version revision library} {
+    variable AutomaticFamilySupport "None"
+    variable FamilySupport { \
+        spartan7    Production \
+        artix7      Production \
+        artix7l     Production \
+        kintex7     Production \
+        kintex7l    Production \
+        kintexu     Production \
+        kintexuplus Production \
+        virtex7     Production \
+        virtexu     Production \
+        virtexuplus Production \
+        zynq        Production \
+        zynquplus   Production \
+        aspartan7   Production \
+        aartix7     Production \
+        azynq       Production \
+        qartix7     Production \
+        qkintex7    Production \
+        qkintex7l   Production \
+        qvirtex7    Production \
+        qzynq       Production \
+    }
+    variable FamilySupportChanged "False"
 	variable IpVersion $version
 	variable IpDispName $name
 	variable IpName [string map {\  _} $IpDispName]
@@ -155,6 +182,24 @@ proc set_taxonomy {taxonomy} {
 	variable IpTaxonomy $taxonomy
 }
 namespace export set_taxonomy
+
+# Set the family support list manually (overwrite default).
+#
+# @param families   List of supported families and their life cycle.
+proc set_supported_families {families} {
+    variable FamilySupport $families
+    variable FamilySupportChanged "True"
+}
+namespace export set_supported_families
+
+
+# Set the automatic family support level.
+#
+# @param level      IP life cycle level
+proc set_automatic_family_support {level} {
+    variable AutomaticFamilySupport $level
+}
+namespace export set_automatic_family_support
 
 # Set the name of the top-entity (only required if Vivado cannot determine the top entity automatically)
 #
@@ -723,6 +768,9 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	}
 	
 	#Start Packaging
+    variable AutomaticFamilySupport
+    variable FamilySupport
+    variable FamilySupportChanged
 	variable IpLibrary
 	variable IpDescription
 	variable IpVersion 
@@ -747,29 +795,18 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 	set_property vendor_display_name $IpVendor [ipx::current_core]
 	set_property company_url $IpVendorUrl [ipx::current_core]
 	set_property version $IpVersion [ipx::current_core]
-	set_property supported_families { \
-                                        spartan7    Production \
-                                        artix7      Production \
-                                        artix7l     Production \
-                                        kintex7     Production \
-                                        kintex7l    Production \
-                                        kintexu     Production \
-                                        kintexuplus Production \
-                                        virtex7     Production \
-                                        virtexu     Production \
-                                        virtexuplus Production \
-                                        zynq        Production \
-                                        zynquplus   Production \
-                                        aspartan7   Production \
-                                        aartix7     Production \
-                                        azynq       Production \
-                                        qartix7     Production \
-                                        qkintex7    Production \
-                                        qkintex7l   Production \
-                                        qvirtex7    Production \
-                                        qzynq       Production \
-                                    } [ipx::current_core]
-					
+
+    #Handle the FPGA family compatibility list.
+    #  In case the FamilySupport list was not changed by the user and the Automatic Family support
+    #  is activated, the FamilySupport list gets cleared from the default values.
+    if {$AutomaticFamilySupport != "None"} {
+        if {$FamilySupportChanged == "False"} {
+        	set FamilySupport = {}
+        }
+        set_property auto_family_support_level $AutomaticFamilySupport [ipx::current_core]
+    }
+    set_property supported_families $FamilySupport [ipx::current_core]
+
     #Make File Group Paths Relative
 	puts "*** Convert all File Group paths to relative paths ***"
 	foreach obj [ipx::get_files -of_objects [ipx::get_file_groups * -of_objects [ipx::current_core]]] {
