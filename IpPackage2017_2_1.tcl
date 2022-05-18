@@ -78,7 +78,7 @@ proc init {name version revision library} {
 	variable IpVersionUnderscore [string map {. _} $version]
     variable IpDescription
     variable IpTargetLanguage "VHDL"
-	variable IpTaxonomy {{"/UserIP"}}
+	variable IpTaxonomy {"/UserIP"}
 	variable SrcRelative [list]
 	variable LibRelative [list]
 	variable LibCopied [list]
