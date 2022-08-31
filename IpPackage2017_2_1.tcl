@@ -414,6 +414,7 @@ proc gui_create_parameter {vhdlName displayName} {
 	dict set CurrentParameter PAGE  $CurrentPage
 	dict set CurrentParameter GROUP $CurrentGroup
 	dict set CurrentParameter VALIDATION  "None"
+	dict set CurrentParameter SHOW_RANGE_HINT true
 	dict set CurrentParameter VALUES {}
 	dict set CurrentParameter WIDGET "text"	
 	dict set CurrentParameter EXPRESSION "None"
@@ -443,6 +444,7 @@ proc gui_create_user_parameter {paramName type initialValue {displayName "None"}
 	dict set CurrentParameter PAGE  $CurrentPage
 	dict set CurrentParameter GROUP $CurrentGroup
 	dict set CurrentParameter VALIDATION  "None"
+	dict set CurrentParameter SHOW_RANGE_HINT true
 	dict set CurrentParameter VALUES {}
 	dict set CurrentParameter WIDGET "text"	
 	dict set CurrentParameter TYPE $type
@@ -498,6 +500,19 @@ proc gui_parameter_set_range {min max} {
 	dict set CurrentParameter VALUES [list $min $max]
 }
 namespace export gui_parameter_set_range
+
+# Disable the input validation entered using a text-field
+proc gui_parameter_disable_range_validation {} {
+	variable CurrentParameter
+	dict set CurrentParameter VALIDATION disable
+}
+namespace export gui_parameter_disable_range_validation
+
+proc gui_parameter_show_range_hint {show} {
+	variable CurrentParameter
+	dict set CurrentParameter SHOW_RANGE_HINT $show
+}
+namespace export gui_parameter_show_range_hint
 
 # Calculate the value of a prameter from an expression (instead of user input)
 #
@@ -853,6 +868,7 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		} elseif {$Widget == "checkbox"} {
 			set_property widget {checkBox} [ipgui::get_guiparamspec -name $ParamName -component [ipx::current_core]]
 		}
+
 		#Validation type
 		set ValidationType [dict get $param VALIDATION]
 		set Values [dict get $param VALUES]
@@ -865,7 +881,14 @@ proc package {tgtDir {edit false} {synth false} {part ""}} {
 		} elseif {$ValidationType == "range"} {
 			set_property value_validation_range_minimum [lindex $Values 0] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 			set_property value_validation_range_maximum [lindex $Values 1] [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
+		} elseif {$ValidationType == "disable"} {
+			set_property value_validation_type none [ipx::get_user_parameters $ParamName -of_objects [ipx::current_core]]
 		}
+
+		#Show range hint
+		set ShowRangeHint [dict get $param SHOW_RANGE_HINT]
+		set_property show_range {$ShowRangeHint} [ipgui::get_guiparamspec -name $ParamName -component [ipx::current_core]]
+
 		#Enablement dependency
 		set EnablementDep [dict get $param ENABLEMENTDEP]
 		set EnablementDef [dict get $param ENABLEMENTDEF]
